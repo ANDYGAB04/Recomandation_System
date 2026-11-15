@@ -60,8 +60,10 @@ Structura backendului:
 | `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
 | `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
 | `app/recommender/` | Motorul de recomandare (scikit-learn), independent de baza de date și de API |
-| `app/dependencies.py` | Dependențe comune, de exemplu sesiunea de bază de date (`SessionDep`) |
-| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, …) |
+| `app/schemas.py` | Formatul JSON al cererilor și răspunsurilor (Pydantic) |
+| `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
+| `app/dependencies.py` | Dependențe comune: sesiunea de bază de date (`SessionDep`) și utilizatorul autentificat (`CurrentUserDep`, 401 fără token valid) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, …) |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
 
 Tabelele se creează la pornire, dar cele existente nu se modifică (nu folosim migrări). După o schimbare în `app/models.py`, șterge `backend/data/hobbyshop.db`.
