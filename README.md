@@ -23,6 +23,7 @@ Echipa: Stoian Cristian-Georgian și Suhan Mihai-Andrei.
 | `backend/` | API-ul FastAPI, motorul de recomandare, scriptul de inițializare a datelor, testele |
 | `frontend/` | Aplicația React |
 | `docs/api.md` | Contractul API: endpoint-urile, formatul JSON, valorile permise, tabelele |
+| `docs/prezentare/Prezentare.pptx` | Prezentarea (partea teoretică): partea 1 Suhan, partea 2 Cristian, în același fișier |
 | `PropunereProiect.md` | Propunerea proiectului: cerințe, profilul utilizatorului, algoritmul, arhitectura, evaluarea |
 | `TemaProiect.txt` | Enunțul temei |
 
