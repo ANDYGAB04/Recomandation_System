@@ -59,6 +59,7 @@ Structura backendului:
 | `app/db.py` | Conexiunea SQLite (SQLModel), cu cheile externe activate pe fiecare conexiune |
 | `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
 | `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
+| `app/recommender/` | Motorul de recomandare (scikit-learn), independent de baza de date și de API |
 | `app/dependencies.py` | Dependențe comune, de exemplu sesiunea de bază de date (`SessionDep`) |
 | `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, …) |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
@@ -66,6 +67,21 @@ Structura backendului:
 Tabelele se creează la pornire, dar cele existente nu se modifică (nu folosim migrări). După o schimbare în `app/models.py`, șterge `backend/data/hobbyshop.db`.
 
 Formatul tuturor endpoint-urilor, inclusiv al celor care urmează, este în [docs/api.md](docs/api.md).
+
+#### Motorul de recomandare
+
+`app/recommender/` recomandă produse pe baza profilului utilizatorului, prin filtrare bazată pe conținut:
+
+- **Vectorii produselor** (`engine.py`): fiecare produs are un vector cu două părți, normalizate separat:
+  - preferințele: categorie, utilizări, niveluri, stiluri, sezoane (`DictVectorizer`);
+  - textul: nume, etichete, descriere (`TfidfVectorizer`), cu pondere mai mică.
+- **Profilul declarat** (`features.py`): setările utilizatorului se traduc în aceleași caracteristici.
+  - Activitățile contează cel mai mult (intensitate „mult” = 1, „puțin” = 0,5), apoi stilurile, nivelul și sezonul.
+  - Nivelurile vecine și echipamentul „tot anul” se potrivesc parțial.
+- **Scorul** este similaritatea cosinus dintre profil și produs.
+- **Lista finală** păstrează doar produsele disponibile, sub bugetul din profil și neexcluse.
+
+Ponderile sunt constante la începutul fișierului `features.py`.
 
 ### Frontend
 
