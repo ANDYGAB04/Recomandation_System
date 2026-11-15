@@ -22,6 +22,7 @@ Echipa: Stoian Cristian-Georgian și Suhan Mihai-Andrei.
 |---|---|
 | `backend/` | API-ul FastAPI, motorul de recomandare, scriptul de inițializare a datelor, testele |
 | `frontend/` | Aplicația React |
+| `docs/api.md` | Contractul API: endpoint-urile, formatul JSON, valorile permise, tabelele |
 | `PropunereProiect.md` | Propunerea proiectului: cerințe, profilul utilizatorului, algoritmul, arhitectura, evaluarea |
 | `TemaProiect.txt` | Enunțul temei |
 
@@ -55,9 +56,15 @@ Structura backendului:
 | `app/main.py` | Crearea aplicației FastAPI, CORS, înregistrarea rutelor |
 | `app/config.py` | Setările, citite din variabile de mediu sau din `.env` |
 | `app/db.py` | Conexiunea SQLite (SQLModel), cu cheile externe activate pe fiecare conexiune |
+| `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
+| `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
 | `app/dependencies.py` | Dependențe comune, de exemplu sesiunea de bază de date (`SessionDep`) |
-| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, …) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, …) |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
+
+Tabelele se creează la pornire, dar cele existente nu se modifică (nu folosim migrări). După o schimbare în `app/models.py`, șterge `backend/data/hobbyshop.db`.
+
+Formatul tuturor endpoint-urilor, inclusiv al celor care urmează, este în [docs/api.md](docs/api.md).
 
 ### Frontend
 
