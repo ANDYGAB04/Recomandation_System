@@ -26,7 +26,9 @@ def create_db_engine(database_file: Path) -> Engine:
 
 
 def init_db(engine: Engine) -> None:
-    """Creează tabelele pentru toate modelele importate până în acest moment."""
+    """Creează tabelele care lipsesc. Tabelele existente nu se modifică."""
+    from . import models  # noqa: F401  (înregistrează modelele în SQLModel.metadata)
+
     SQLModel.metadata.create_all(engine)
 
 
