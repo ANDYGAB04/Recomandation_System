@@ -27,10 +27,41 @@ Echipa: Stoian Cristian-Georgian și Suhan Mihai-Andrei.
 
 ## Pornire
 
-Pașii de instalare și pornire se adaugă odată cu scheletele aplicației:
+### Backend
 
-- backend: pasul 02 (CRI-6);
-- frontend: pasul 03 (CRI-7).
+Necesită Python 3.11 sau mai nou. Din directorul `backend/`:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate          # pe Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload      # API: http://127.0.0.1:8000, documentație: http://127.0.0.1:8000/docs
+python -m pytest                   # testele
+```
+
+Configurarea are valori implicite pentru dezvoltare. Pentru a le schimba, copiază `backend/.env.example` în `backend/.env`:
+
+| Variabilă | Implicit | Rol |
+|---|---|---|
+| `HOBBYSHOP_DATABASE_PATH` | `data/hobbyshop.db` | Fișierul SQLite, relativ la `backend/`; se creează la pornire |
+| `HOBBYSHOP_SECRET_KEY` | o cheie de dezvoltare | Cheia pentru semnarea token-urilor de autentificare |
+| `HOBBYSHOP_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Adresele de unde frontendul poate apela API-ul |
+
+Structura backendului:
+
+| Fișier | Rol |
+|---|---|
+| `app/main.py` | Crearea aplicației FastAPI, CORS, înregistrarea rutelor |
+| `app/config.py` | Setările, citite din variabile de mediu sau din `.env` |
+| `app/db.py` | Conexiunea SQLite (SQLModel), cu cheile externe activate pe fiecare conexiune |
+| `app/dependencies.py` | Dependențe comune, de exemplu sesiunea de bază de date (`SessionDep`) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, …) |
+| `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
+
+### Frontend
+
+Pașii de pornire se adaugă la pasul 03 (CRI-7).
 
 ## Cum lucrăm
 
