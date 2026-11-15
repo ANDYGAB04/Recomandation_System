@@ -1,0 +1,30 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout.jsx'
+import AuthPage from './pages/AuthPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+import SettingsPage from './pages/SettingsPage.jsx'
+import CatalogPage from './pages/CatalogPage.jsx'
+import ProductPage from './pages/ProductPage.jsx'
+import RecommendationsPage from './pages/RecommendationsPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
+import EvaluationPage from './pages/EvaluationPage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Navigate to="/catalog" replace />} />
+        <Route path="autentificare" element={<AuthPage />} />
+        <Route path="inregistrare" element={<RegisterPage />} />
+        <Route path="setari" element={<SettingsPage />} />
+        <Route path="catalog" element={<CatalogPage />} />
+        <Route path="produs/:id" element={<ProductPage />} />
+        <Route path="recomandari" element={<RecommendationsPage />} />
+        <Route path="profil" element={<ProfilePage />} />
+        <Route path="evaluare" element={<EvaluationPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  )
+}
