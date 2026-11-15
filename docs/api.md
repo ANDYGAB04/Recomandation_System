@@ -119,7 +119,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `GET /health` | 02 (CRI-6) | Cristian — gata |
 | `GET /vocabulary` | 04 (CRI-8) | Cristian — gata |
 | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` | 07 (CRI-9) | Suhan— gata |
-| `GET /products`, `GET /products/{id}` | 08 (CRI-10) | Suhan |
+| `GET /products`, `GET /products/{id}` | 08 (CRI-10) | Suhan — gata |
 | `GET /profile`, `PUT /profile` | 10 (CRI-12) | Suhan |
 | `POST /interactions`, `GET /me/history` | 11 (CRI-13) | Suhan |
 | `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian |
@@ -383,4 +383,4 @@ Regulile verificate chiar de baza de date:
 
 Ștergerea unui utilizator îi șterge profilul, interacțiunile și favoritele.
 
-Nu folosim migrări. Dacă se schimbă un model, se șterge `backend/data/hobbyshop.db`, iar baza de date se recreează la pornire. Scriptul de inițializare cu date demo vine la pasul 12 (CRI-19).
+Nu folosim migrări. Dacă se schimbă un model, se șterge `backend/data/hobbyshop.db`, iar baza de date se recreează la pornire. Scriptul de inițializare (`python -m app.seed`) încarcă deocamdată catalogul (pasul 08); conturile demo și clienții simulați vin la pasul 12 (CRI-19).

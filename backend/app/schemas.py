@@ -49,3 +49,28 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserPublic
+
+
+# ---------- Catalog ----------
+
+
+class ProductOut(BaseModel):
+    id: int
+    name: str
+    category: str
+    usages: list[str]
+    levels: list[str]
+    styles: list[str]
+    seasons: list[str]
+    tags: list[str]
+    description: str
+    price: float
+    available: bool
+    is_test_data: bool
+
+
+class ProductPage(BaseModel):
+    items: list[ProductOut]
+    total: int
+    limit: int
+    offset: int

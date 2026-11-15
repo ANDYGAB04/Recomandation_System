@@ -38,6 +38,7 @@ python3 -m venv .venv
 source .venv/bin/activate          # pe Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
+python -m app.seed                 # încarcă datele de test (catalogul); se poate rula de mai multe ori
 uvicorn app.main:app --reload      # API: http://127.0.0.1:8000, documentație: http://127.0.0.1:8000/docs
 python -m pytest                   # testele
 ```
@@ -63,7 +64,8 @@ Structura backendului:
 | `app/schemas.py` | Formatul JSON al cererilor și răspunsurilor (Pydantic) |
 | `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
 | `app/dependencies.py` | Dependențe comune: sesiunea de bază de date (`SessionDep`) și utilizatorul autentificat (`CurrentUserDep`, 401 fără token valid) |
-| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, …) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, …) |
+| `app/seed/` | Scriptul de inițializare (`python -m app.seed`). `catalog.py` generează cu seed fix ~130 de produse de test: fiecare tip de produs în liniile Start / Activ / Pro |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
 
 Tabelele se creează la pornire, dar cele existente nu se modifică (nu folosim migrări). După o schimbare în `app/models.py`, șterge `backend/data/hobbyshop.db`.
