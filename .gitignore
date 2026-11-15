@@ -218,3 +218,46 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ------------------------------------------------------------
+# Sistem de Recomandare (HobbyShop)
+# ------------------------------------------------------------
+
+# Materiale de curs și note personale (nu se publică)
+Cursuri/
+materiale-markdown/
+1. Informatii generale - laborator.pptx
+Observatii-Laborator.txt
+CONVERT-TO-MARKDOWN-SKILL.md
+
+# Template-ul Python de mai sus ignoră orice director `lib/`;
+# îl permitem în frontend, unde React îl folosește des.
+!frontend/src/lib/
+
+# Frontend (Node / Vite)
+node_modules/
+frontend/dist/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env.local
+.env.*.local
+
+# Baza de date SQLite locală (se regenerează din scriptul de inițializare)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Editoare
+.vscode/
+.idea/
+*.swp
+
+# Sistem de operare (inclusiv fișierele create de Windows la copierea în WSL)
+.DS_Store
+Thumbs.db
+desktop.ini
+*:Zone.Identifier
