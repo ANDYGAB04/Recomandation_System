@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import RecommendationList from '../components/RecommendationList.jsx'
+import RecommendedStrip from '../components/RecommendedStrip.jsx'
 import Spinner from '../components/Spinner.jsx'
-import { AvailabilityBadge, ErrorState, TestDataBadge } from '../components/Status.jsx'
+import { AvailabilityBadge, EmptyState, ErrorState, TestDataBadge } from '../components/Status.jsx'
 import { api, errorMessage } from '../lib/api.js'
 import { formatPrice } from '../lib/format.js'
+import { useSimilarProducts } from '../lib/recommendations.js'
 import { useVocabulary } from '../lib/vocabulary.js'
 
 export default function ProductPage() {
@@ -104,15 +107,28 @@ export default function ProductPage() {
         </aside>
       </article>
 
-      {/* Locul pentru „Produse similare”: îl completează pasul 16 (CRI-21), cu GET /products/{id}/similar. */}
       <section id="produse-similare" aria-labelledby="produse-similare-titlu">
         <h2 id="produse-similare-titlu" className="text-lg font-semibold text-gray-900">
           Produse similare
         </h2>
-        <div className="mt-3 rounded-lg border border-dashed border-gray-300 bg-white p-6 text-sm text-gray-500">
-          Produsele similare apar aici în curând.
+        <div className="mt-3">
+          <SimilarProducts productId={product.id} />
         </div>
       </section>
+
+      {/* Produsul deschis nu apare în propriile recomandări. */}
+      <RecommendedStrip exclude={[product.id]} />
     </section>
+  )
+}
+
+function SimilarProducts({ productId }) {
+  const similar = useSimilarProducts(productId, 4)
+  return (
+    <RecommendationList
+      resource={similar}
+      scoreLabel="Asemănare"
+      emptyState={<EmptyState title="Nu am găsit produse asemănătoare." />}
+    />
   )
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard.jsx'
+import RecommendedStrip from '../components/RecommendedStrip.jsx'
 import { EmptyState, ErrorState, TestDataBadge } from '../components/Status.jsx'
 import { api, errorMessage } from '../lib/api.js'
 import { useVocabulary } from '../lib/vocabulary.js'
@@ -130,6 +131,13 @@ export default function CatalogPage() {
           </p>
         )}
       </div>
+
+      {/* Recomandările apar doar pe prima pagină a catalogului, fără filtre. */}
+      {!hasFilters && filters.page === 1 && (
+        <div className="mt-6">
+          <RecommendedStrip />
+        </div>
+      )}
 
       {/* Filtre */}
       <div className="mt-6 space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
