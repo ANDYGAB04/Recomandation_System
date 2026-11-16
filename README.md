@@ -148,7 +148,8 @@ Structura frontendului:
 | `src/components/RequireAuth.jsx` | Rutele protejate (fără cont → `/autentificare`) și cele doar pentru vizitatori |
 | `src/components/Form.jsx` | Componente comune de formular (câmp, eroare, buton) |
 | `src/lib/vocabulary.js` | `useVocabulary()`: etichetele în română din `GET /vocabulary` (cerute o singură dată) |
-| `src/lib/format.js` | Formatarea prețurilor (RON) |
+| `src/lib/format.js` | Formatarea prețurilor (RON) și a datelor |
+| `src/lib/interactions.js` | `sendInteraction()` (cu id unic de eveniment) și `useHistory()` (`GET /me/history`) |
 | `src/components/ProductCard.jsx` | Cardul unui produs, folosit în catalog și la recomandări |
 | `src/components/RecommendationList.jsx` | Lista de recomandări sau de produse similare, cu potrivirea și explicația fiecărui produs și mesajul pentru rezervă |
 | `src/components/RecommendedStrip.jsx` | Secțiunea scurtă „Recomandate pentru tine” din catalog și de pe pagina de produs; pentru vizitatori, invitația de a-și crea cont |
@@ -166,9 +167,10 @@ Rutele:
 | `/inregistrare` | Înregistrare (apoi direct la setări) | doar fără cont |
 | `/setari` | Setări de profil: activități cu intensitate, nivel, stiluri, sezon, buget; deschisă automat după înregistrare | cu cont |
 | `/catalog` | Catalog (pagina de start); filtrele stau în adresă (`?categorie=…&q=…&pret_maxim=…&disponibile=1&pagina=…`) | public |
-| `/produs/:id` | Pagina de produs | public |
+| `/produs/:id` | Pagina de produs; cu cont, deschiderea trimite o vizualizare și apar butoanele de favorite și cumpărare (simulată) | public |
 | `/recomandari` | Recomandate pentru tine | cu cont |
 | `/profil` | Profilul meu de recomandare | cu cont |
+| `/istoric` | Favorite și istoric: favoritele, cumpărăturile și ultimele 50 de evenimente | cu cont |
 | `/evaluare` | Evaluare | public |
 
 ## Cum lucrăm
