@@ -112,7 +112,7 @@ Structura backendului:
 | `app/main.py` | Crearea aplicației FastAPI, CORS, înregistrarea rutelor |
 | `app/config.py` | Setările, citite din variabile de mediu sau din `.env` |
 | `app/db.py` | Conexiunea SQLite (SQLModel), cu cheile externe activate pe fiecare conexiune |
-| `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
+| `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`, `recommendation_feedback`) |
 | `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
 | `app/recommender/` | Motorul de recomandare (scikit-learn), independent de baza de date și de API |
 | `app/evaluation.py` | Evaluarea offline: popularitate vs. recomandarea bazată pe profil (`python -m app.evaluation`, `GET /evaluation`) |
