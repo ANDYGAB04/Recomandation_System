@@ -66,6 +66,16 @@ class History:
             weights[product_id] += event_weights[EventType.PURCHASE] * count
         return {product_id: w for product_id, w in weights.items() if w > 0}
 
+    def weights_by_event(
+        self, event_weights: Mapping[str, float] = EVENT_WEIGHTS, view_cap: int = VIEW_CAP
+    ) -> dict[str, float]:
+        """Cât contribuie fiecare tip de acțiune la profilul din comportament (aceleași ponderi ca mai sus)."""
+        return {
+            EventType.PURCHASE.value: event_weights[EventType.PURCHASE] * sum(self.purchases.values()),
+            EventType.FAVORITE.value: event_weights[EventType.FAVORITE] * len(self.favorites),
+            EventType.VIEW.value: event_weights[EventType.VIEW] * sum(min(n, view_cap) for n in self.views.values()),
+        }
+
     def strongest_event(self, product_id: int) -> str | None:
         """Cea mai puternică interacțiune cu produsul, pentru explicații."""
         if product_id in self.purchases:

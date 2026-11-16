@@ -197,5 +197,7 @@ class ProfileProductOut(BaseModel):
 
 class RecommendationProfileOut(BaseModel):
     sources: ProfileSources
+    # "purchase" / "favorite" / "view" → partea din profilul din comportament; {} fără istoric
+    behavior_breakdown: dict[str, float]
     interests: list[InterestOut]
     top_products: list[ProfileProductOut]

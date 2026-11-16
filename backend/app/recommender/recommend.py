@@ -223,6 +223,8 @@ class ProfileSummary:
 
     declared_share: float
     behavior_share: float
+    # tipul acțiunii → partea ei din profilul din comportament (însumează 1; gol fără istoric)
+    behavior_breakdown: dict[str, float]
     # (preferință, pondere); ponderile tuturor preferințelor din profil însumează 1
     interests: list[tuple[Match, float]]
     # (id produs, pondere în profilul din comportament, tipurile de evenimente)
@@ -267,4 +269,7 @@ def profile_summary(
         (pid, weight, [event.value for event, products_with_event in events.items() if pid in products_with_event])
         for pid, weight in products
     ]
-    return ProfileSummary(shares[0], shares[1], interests, summary_products)
+    by_event = history.weights_by_event()
+    total_events = sum(by_event.values())
+    breakdown = {event: weight / total_events for event, weight in by_event.items()} if total_events else {}
+    return ProfileSummary(shares[0], shares[1], breakdown, interests, summary_products)

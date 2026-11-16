@@ -137,6 +137,8 @@ def test_k_is_validated(api):
 def test_recommendation_profile_shows_sources_interests_and_products(api):
     data = api.get("/recommendations/profile", headers=login(api, MARIA)).json()
     assert data["sources"] == {"declared": 0.5, "behavior": 0.5}
+    # o cumpărare (10), un favorit (5), 4 vizualizări (1 fiecare) → 19
+    assert data["behavior_breakdown"] == {"purchase": round(10 / 19, 4), "favorite": round(5 / 19, 4), "view": round(4 / 19, 4)}
     assert data["interests"][0]["label"] == "Alergare"
     assert sum(i["weight"] for i in data["interests"]) <= 1.0001
     top = data["top_products"][0]
@@ -152,7 +154,12 @@ def test_recommendation_profile_of_maria_and_radu_differ(api):
 
 def test_empty_account_has_an_empty_recommendation_profile(api):
     data = api.get("/recommendations/profile", headers=register_headers(api, email="gol2@example.com")).json()
-    assert data == {"sources": {"declared": 0.0, "behavior": 0.0}, "interests": [], "top_products": []}
+    assert data == {
+        "sources": {"declared": 0.0, "behavior": 0.0},
+        "behavior_breakdown": {},
+        "interests": [],
+        "top_products": [],
+    }
 
 
 # ---- GET /products/{id}/similar ----

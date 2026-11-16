@@ -72,6 +72,7 @@ def get_recommendation_profile(request: Request, session: SessionDep, user: Curr
     summary = profile_summary(rec, load_profile(session, user.id), load_history(session, user.id))
     return RecommendationProfileOut(
         sources=ProfileSources(declared=summary.declared_share, behavior=summary.behavior_share),
+        behavior_breakdown={event: round(share, 4) for event, share in summary.behavior_breakdown.items()},
         interests=[
             InterestOut(group=m.group, value=m.value, label=m.label, weight=round(weight, 4))
             for m, weight in summary.interests

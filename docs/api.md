@@ -323,10 +323,18 @@ Datele pentru pagina „Profilul meu de recomandare”:
 ```json
 {
   "sources": { "declared": 0.5, "behavior": 0.5 },
-  "interests": [{ "group": "activities", "value": "running", "label": "Alergare", "weight": 0.61 }],
-  "top_products": [{ "product": { "id": 7, "name": "Pantofi de alergare Trail" }, "weight": 10, "events": ["purchase"] }]
+  "behavior_breakdown": { "purchase": 0.5263, "favorite": 0.2632, "view": 0.2105 },
+  "interests": [{ "group": "activities", "value": "running", "label": "Alergare", "weight": 0.4 }],
+  "top_products": [{ "product": { "id": 7, "name": "Pantofi de alergare Trail" }, "weight": 12, "events": ["purchase", "view"] }]
 }
 ```
+
+| Câmp | Descriere |
+|---|---|
+| `sources` | Cât contează setările (`declared`) și comportamentul (`behavior`) în profil; `0` pentru o sursă lipsă |
+| `behavior_breakdown` | Cum se împarte comportamentul pe tipuri de acțiuni (cumpărări, favorite, vizualizări); însumează 1, `{}` fără istoric |
+| `interests` | Cele mai importante preferințe din profil; `weight` însumat pe toate preferințele dă 1 |
+| `top_products` | Produsele din istoric cu cea mai mare pondere (cumpărare = 10, favorit = 5, vizualizare = 1, cel mult 3 per produs) |
 
 #### `GET /products/{id}/similar`
 
