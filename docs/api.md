@@ -124,7 +124,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `GET /profile`, `PUT /profile` | 10 (CRI-12) | Suhan— gata |
 | `POST /interactions`, `GET /me/history` | 11 (CRI-13) | Suhan— gata |
 | `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian — gata |
-| `GET /evaluation` | 20 (CRI-23) | Cristian |
+| `GET /evaluation` | 20 (CRI-23) | Cristian — gata |
 
 ### Sistem
 
@@ -358,21 +358,57 @@ Erori: `404` „Produsul nu există.”, `401` dacă tokenul trimis este invalid
 
 #### `GET /evaluation`
 
+Public (fără autentificare). Rezultatul se calculează la prima cerere și se refolosește cât timp produsele și interacțiunile nu se schimbă. Fără date de test, răspunsul este `503`, cu instrucțiunea `python -m app.seed`.
+
 ```json
 {
   "k": 5,
   "note": "Date sintetice: rezultatele descriu comportamentul simulatorului, nu preferințe reale.",
-  "selected_config": "…",
-  "validation": { "start": "…", "end": "…", "users_evaluated": 120, "users_without_relevant": 280, "users_without_history": 3, "results": ["…rânduri…"] },
+  "selected_config": "profil: α = 0.75, curs 1/5/10",
+  "validation": {
+    "start": "2026-09-30T00:00:00Z", "end": "2026-10-15T00:00:00Z",
+    "users_total": 300, "users_evaluated": 98, "users_without_relevant": 202, "users_without_history": 5,
+    "results": ["…rânduri…"]
+  },
   "test": { "…": "aceeași formă" }
 }
 ```
 
+| Câmp | Descriere |
+|---|---|
+| `validation` | Intervalul pe care se aleg ponderile; `results` are popularitatea și toate combinațiile încercate |
+| `test` | Intervalul raportat; `results` are popularitatea, configurația aplicației și, dacă diferă, pe cea aleasă pe validare și ponderile inițiale |
+| `users_evaluated` | Clienții cu cel puțin o cumpărare relevantă în interval |
+| `users_without_relevant` | Clienții fără cumpărări relevante în interval (excluși din metrici) |
+| `users_without_history` | Clienții evaluați care nu aveau istoric înainte de interval (metricile lor sunt separate) |
+
 Un rând din `results`:
 
 ```json
-{ "config": "popularitate", "strategy": "popular", "precision_at_k": 0.06, "recall_at_k": 0.22, "coverage": 0.07, "latency_ms": 0.05, "users": 129 }
+{
+  "config": "profil: α = 0.75, curs 1/5/10 (folosită de aplicație)",
+  "strategy": "personalized",
+  "alpha": 0.75,
+  "event_weights": "curs 1/5/10",
+  "precision_at_k": 0.0903,
+  "recall_at_k": 0.3041,
+  "coverage": 0.9083,
+  "latency_ms": 0.25,
+  "users": 113,
+  "users_without_history": 1,
+  "without_history": { "precision_at_k": 0.0, "recall_at_k": 0.0 }
+}
 ```
+
+| Câmp | Descriere |
+|---|---|
+| `strategy` | `personalized` (profil) sau `popular` |
+| `alpha`, `event_weights` | Ponderile încercate; `null` pentru popularitate |
+| `precision_at_k` | Partea produselor relevante între primele k recomandări |
+| `recall_at_k` | Partea produselor relevante din interval găsite în primele k |
+| `coverage` | Partea din catalogul disponibil care apare în recomandări |
+| `latency_ms` | Timpul mediu pentru o listă de recomandări |
+| `without_history` | Metricile pentru clienții fără istoric, raportate separat (`null` dacă nu există) |
 
 ## Baza de date
 

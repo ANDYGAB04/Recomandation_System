@@ -82,6 +82,7 @@ Structura backendului:
 | `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
 | `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
 | `app/recommender/` | Motorul de recomandare (scikit-learn), independent de baza de date și de API |
+| `app/evaluation.py` | Evaluarea offline: popularitate vs. recomandarea bazată pe profil (`python -m app.evaluation`, `GET /evaluation`) |
 | `app/recommendation_service.py` | Legătura motorului cu baza de date: vectorii produselor (recalculați doar când se schimbă catalogul), profilul, istoricul, popularitatea |
 | `app/schemas.py` | Formatul JSON al cererilor și răspunsurilor (Pydantic) |
 | `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
@@ -107,7 +108,7 @@ Formatul tuturor endpoint-urilor, inclusiv al celor care urmează, este în [doc
 - **Profilul din comportament** (`behavior.py`): suma ponderată a vectorilor produselor din istoric.
   - Ponderile vin din curs: vizualizare = 1 (cel mult 3 per produs, ca refresh-urile să nu conteze), favorit = 5, cumpărare = 10.
   - Favoritele urmează ultima acțiune (adăugat / scos).
-- **Profilul final** (`recommend.py`): `α × profil declarat + (1 − α) × profil din comportament`, cu α = 0,5. Dacă lipsește una dintre părți, se folosește cealaltă.
+- **Profilul final** (`recommend.py`): `α × profil declarat + (1 − α) × profil din comportament`, cu α = 0,75, ales la evaluare (vezi mai jos). Dacă lipsește una dintre părți, se folosește cealaltă.
 - **Scorul** este similaritatea cosinus dintre profil și produs.
 - **Lista finală** păstrează doar produsele disponibile, sub bugetul din profil, necumpărate și neexcluse (de exemplu produsul deschis în pagină).
 - **Rezerva:** fără setări și fără istoric, sau dacă nimic nu se potrivește, se recomandă produsele cu cei mai mulți cumpărători. Motivul se trimite în `fallback_reason`.
@@ -117,6 +118,36 @@ Formatul tuturor endpoint-urilor, inclusiv al celor care urmează, este în [doc
 - **Produsele similare** cu un produs dat au și ele explicație, cu caracteristicile comune.
 
 Ponderile sunt constante la începutul fișierelor `features.py`, `behavior.py` și `recommend.py`.
+
+#### Evaluarea offline
+
+```bash
+python -m app.evaluation           # afișează rezultatele în terminal; aceleași date sunt la GET /evaluation
+```
+
+`app/evaluation.py` compară popularitatea cu recomandarea bazată pe profil, pe istoricul celor 300 de clienți simulați:
+
+- **Împărțirea:** istoricul de 90 de zile se împarte cronologic în antrenare (zilele 0–60), validare (60–75) și test (75–90).
+- **Fără scurgeri de informație:** profilurile din comportament și popularitatea se construiesc doar din evenimentele de dinaintea fiecărui interval.
+- **Relevant** înseamnă un produs cumpărat în interval, încă disponibil și necumpărat înainte.
+- **Metrici:** Precision@5, Recall@5, acoperirea catalogului și timpul de răspuns. Clienții fără istoric se raportează separat.
+- **Alegerea ponderilor:** pe validare, dintre α ∈ {0; 0,25; 0,5; 0,75; 1} și ponderile acțiunilor (curs 1/5/10 sau egale). A câștigat α = 0,75 cu ponderile din curs, pe care le folosește acum aplicația.
+
+Rezultatele pe test, cu datele implicite (`python -m app.seed --reset`):
+
+| Configurație | Precision@5 | Recall@5 | Acoperire |
+|---|---|---|---|
+| Popularitate | 0,044 | 0,164 | 7,5% |
+| Profil, α = 0,75 (aplicația) | 0,090 | 0,304 | 90,8% |
+| Profil, α = 0,5 (ponderile inițiale) | 0,097 | 0,316 | 89,2% |
+
+Concluziile:
+
+- Recomandarea bazată pe profil găsește de aproximativ două ori mai multe produse relevante decât popularitatea și folosește aproape tot catalogul, nu doar câteva produse.
+- Pe validare, combinația dintre setări și comportament e mai bună decât fiecare sursă luată separat.
+- Pe test, α = 0,5 iese ușor peste α = 0,75. Cu ~114 clienți evaluați, diferența nu e concludentă, iar alegerea rămâne cea făcută pe validare.
+
+**Datele sunt sintetice:** rezultatele descriu comportamentul simulatorului din `app/seed/simulation.py`, nu preferințe reale.
 
 ### Frontend
 
