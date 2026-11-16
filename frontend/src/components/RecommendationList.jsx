@@ -79,7 +79,8 @@ export default function RecommendationList({ resource, scoreLabel = 'Potrivire',
   const popular = data.strategy === 'popular'
   return (
     <div className="space-y-4">
-      {popular && <FallbackNotice reason={data.fallback_reason} />}
+      {/* Mesajul despre rezervă doar când există produse de arătat; altfel rămâne starea de listă goală. */}
+      {popular && data.items.length > 0 && <FallbackNotice reason={data.fallback_reason} />}
       {data.items.length === 0 ? (
         emptyState ?? <EmptyState title="Nu am găsit produse potrivite." />
       ) : (
