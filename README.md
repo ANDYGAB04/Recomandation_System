@@ -38,10 +38,31 @@ python3 -m venv .venv
 source .venv/bin/activate          # pe Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-python -m app.seed                 # încarcă datele de test (catalogul); se poate rula de mai multe ori
+python -m app.seed                 # încarcă datele de test; se poate rula de mai multe ori
+python -m app.seed --reset         # șterge TOATE datele și le recreează (de exemplu înainte de prezentare)
 uvicorn app.main:app --reload      # API: http://127.0.0.1:8000, documentație: http://127.0.0.1:8000/docs
 python -m pytest                   # testele
 ```
+
+#### Date de test
+
+`python -m app.seed` încarcă:
+
+- **catalogul:** 132 de produse de test;
+- **două conturi demonstrative**, cu date complet diferite:
+
+  | Cont | E-mail | Parolă | Profil |
+  |---|---|---|---|
+  | Maria | `maria@example.com` | `maria2026` | alergare (mult), începătoare, buget redus, vară, buget maxim 300 lei; istoric doar cu produse de alergare |
+  | Radu | `radu@example.com` | `radu2026` | camping și drumeție (mult), avansat, rezistență, iarnă, buget maxim 5000 lei; istoric doar cu produse de camping și drumeție |
+
+  Cele două profiluri nu au nicio activitate, niciun stil și niciun sezon în comun. Primele 10 recomandări ale lor nu au niciun produs comun.
+- **300 de clienți simulați** (`client001@simulat.example.com` …):
+  - setări de profil și istoric pe 90 de zile (1 august – 30 octombrie 2026), generate cu seed fix;
+  - folosiți pentru popularitate (rezerva motorului) și pentru evaluare;
+  - nu se pot autentifica.
+
+Fără `--reset`, scriptul completează doar ce lipsește și nu atinge conturile create din aplicație. Cu `--reset`, șterge totul, inclusiv conturile create din aplicație, și recreează aceleași date. Domeniul `example.com` e rezervat pentru exemple, deci nu aparține nimănui.
 
 Configurarea are valori implicite pentru dezvoltare. Pentru a le schimba, copiază `backend/.env.example` în `backend/.env`:
 
@@ -65,7 +86,7 @@ Structura backendului:
 | `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
 | `app/dependencies.py` | Dependențe comune: sesiunea de bază de date (`SessionDep`) și utilizatorul autentificat (`CurrentUserDep`, 401 fără token valid) |
 | `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, `profile.py`, `interactions.py`, …) |
-| `app/seed/` | Scriptul de inițializare (`python -m app.seed`). `catalog.py` generează cu seed fix ~130 de produse de test: fiecare tip de produs în liniile Start / Activ / Pro |
+| `app/seed/` | Scriptul de inițializare (`python -m app.seed [--reset]`): `catalog.py` (produsele, în liniile Start / Activ / Pro), `demo.py` (Maria și Radu), `simulation.py` (clienții simulați), `timeline.py` (perioada simulată) |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
 
 Tabelele se creează la pornire, dar cele existente nu se modifică (nu folosim migrări). După o schimbare în `app/models.py`, șterge `backend/data/hobbyshop.db`.

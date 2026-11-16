@@ -383,4 +383,4 @@ Regulile verificate chiar de baza de date:
 
 Ștergerea unui utilizator îi șterge profilul, interacțiunile și favoritele.
 
-Nu folosim migrări. Dacă se schimbă un model, se șterge `backend/data/hobbyshop.db`, iar baza de date se recreează la pornire. Scriptul de inițializare (`python -m app.seed`) încarcă deocamdată catalogul (pasul 08); conturile demo și clienții simulați vin la pasul 12 (CRI-19).
+Nu folosim migrări. Dacă se schimbă un model, se șterge `backend/data/hobbyshop.db`, iar baza de date se recreează la pornire. Scriptul de inițializare (`python -m app.seed`) încarcă catalogul, conturile demo (Maria și Radu) și clienții simulați; `python -m app.seed --reset` le recreează de la zero.
