@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings, get_settings
 from .db import create_db_engine, init_db
-from .routers import auth, health, products, profile, vocabulary
+from .routers import auth, health, interactions, products, profile, vocabulary
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -42,6 +42,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth.router)
     app.include_router(products.router)
     app.include_router(profile.router)
+    app.include_router(interactions.router)
     return app
 
 

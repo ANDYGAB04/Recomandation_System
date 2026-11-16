@@ -5,7 +5,7 @@ from typing import Annotated
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, PlainSerializer, StringConstraints, field_validator
 
-from .vocabulary import Activity, Intensity, Level, Season, Style
+from .vocabulary import Activity, EventType, Intensity, Level, Season, Style
 
 
 def _as_utc(value: datetime) -> datetime:
@@ -108,3 +108,41 @@ class ProfileOut(BaseModel):
     max_budget: float | None
     is_complete: bool
     updated_at: UtcDatetime
+
+
+# ---------- Interacțiuni ----------
+
+
+class InteractionIn(BaseModel):
+    event_id: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=64)]
+    product_id: int
+    type: EventType
+
+
+class InteractionRecorded(BaseModel):
+    event_id: str
+    # false dacă evenimentul cu același event_id fusese deja salvat
+    recorded: bool
+
+
+class ProductRef(BaseModel):
+    id: int
+    name: str
+
+
+class PurchaseOut(BaseModel):
+    product: ProductOut
+    purchased_at: UtcDatetime
+
+
+class EventOut(BaseModel):
+    event_id: str
+    type: str
+    product: ProductRef
+    created_at: UtcDatetime
+
+
+class HistoryOut(BaseModel):
+    favorites: list[ProductOut]
+    purchases: list[PurchaseOut]
+    events: list[EventOut]
