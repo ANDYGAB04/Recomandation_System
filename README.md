@@ -82,10 +82,19 @@ Formatul tuturor endpoint-urilor, inclusiv al celor care urmează, este în [doc
 - **Profilul declarat** (`features.py`): setările utilizatorului se traduc în aceleași caracteristici.
   - Activitățile contează cel mai mult (intensitate „mult” = 1, „puțin” = 0,5), apoi stilurile, nivelul și sezonul.
   - Nivelurile vecine și echipamentul „tot anul” se potrivesc parțial.
+- **Profilul din comportament** (`behavior.py`): suma ponderată a vectorilor produselor din istoric.
+  - Ponderile vin din curs: vizualizare = 1 (cel mult 3 per produs, ca refresh-urile să nu conteze), favorit = 5, cumpărare = 10.
+  - Favoritele urmează ultima acțiune (adăugat / scos).
+- **Profilul final** (`recommend.py`): `α × profil declarat + (1 − α) × profil din comportament`, cu α = 0,5. Dacă lipsește una dintre părți, se folosește cealaltă.
 - **Scorul** este similaritatea cosinus dintre profil și produs.
-- **Lista finală** păstrează doar produsele disponibile, sub bugetul din profil și neexcluse.
+- **Lista finală** păstrează doar produsele disponibile, sub bugetul din profil, necumpărate și neexcluse (de exemplu produsul deschis în pagină).
+- **Rezerva:** fără setări și fără istoric, sau dacă nimic nu se potrivește, se recomandă produsele cu cei mai mulți cumpărători. Motivul se trimite în `fallback_reason`.
+- **Explicațiile:** fiecare recomandare primește:
+  - preferințele alese explicit în setări care se regăsesc în produs („pentru că ai ales alergare și buget redus”);
+  - produsele din istoric care au influențat-o cel mai mult („seamănă cu …, din favoritele tale”).
+- **Produsele similare** cu un produs dat au și ele explicație, cu caracteristicile comune.
 
-Ponderile sunt constante la începutul fișierului `features.py`.
+Ponderile sunt constante la începutul fișierelor `features.py`, `behavior.py` și `recommend.py`.
 
 ### Frontend
 

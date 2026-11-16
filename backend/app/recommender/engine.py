@@ -9,7 +9,7 @@ partea de preferințe, așa că blocul de text nu schimbă ordinea produselor pe
 (nume, etichete, descriere) contează la produsele similare și la profilul din comportament.
 """
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -76,6 +76,23 @@ class ContentRecommender:
         vector = np.concatenate([preferences, np.zeros(self.matrix.shape[1] - self.n_preference_features)])
         norm = np.linalg.norm(vector)
         return vector / norm if norm > 0 else None
+
+    def behavior_profile(self, weights: Mapping[int, float]) -> np.ndarray | None:
+        """Suma ponderată a vectorilor produselor din istoric, normalizată; None fără istoric."""
+        rows = [(self.row[pid], w) for pid, w in weights.items() if pid in self.row and w > 0]
+        if not rows:
+            return None
+        indices, row_weights = zip(*rows)
+        vector = np.asarray(self.matrix[list(indices)].T @ np.array(row_weights, dtype=float)).ravel()
+        norm = np.linalg.norm(vector)
+        return vector / norm if norm > 0 else None
+
+    def product_vector(self, product_id: int) -> np.ndarray:
+        return self.matrix[self.row[product_id]].toarray().ravel()
+
+    def similarity(self, product_a: int, product_b: int) -> float:
+        """Similaritatea cosinus dintre două produse."""
+        return float(self.matrix[self.row[product_a]].multiply(self.matrix[self.row[product_b]]).sum())
 
     def scores(self, profile_vector: np.ndarray) -> np.ndarray:
         """Similaritatea cosinus dintre profil și fiecare produs (vectorii sunt deja normalizați)."""
