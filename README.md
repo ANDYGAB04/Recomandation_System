@@ -142,22 +142,25 @@ Structura frontendului:
 | `src/main.jsx` | Punctul de intrare: React + `BrowserRouter` |
 | `src/App.jsx` | Rutele aplicației |
 | `src/components/Layout.jsx` | Layout-ul comun: bara de navigare, conținutul, subsolul |
-| `src/lib/api.js` | Modulul pentru apelurile către API (`api.get`, `api.post`, …, `getHealth`); toate paginile îl folosesc |
+| `src/lib/api.js` | Modulul pentru apelurile către API (`api.get`, `api.post`, …); trimite automat token-ul și transformă erorile în mesaje (`errorMessage`, `fieldErrors`) |
+| `src/lib/auth.jsx` | `AuthProvider` și `useAuth()`: contul curent, `login`, `register`, `logout`; token-ul se păstrează în `localStorage` |
+| `src/components/RequireAuth.jsx` | Rutele protejate (fără cont → `/autentificare`) și cele doar pentru vizitatori |
+| `src/components/Form.jsx` | Componente comune de formular (câmp, eroare, buton) |
 | `src/pages/` | Câte o pagină pe rută |
 | `src/index.css` | Tailwind CSS (v4, prin pluginul `@tailwindcss/vite`) |
 
 Rutele:
 
-| Rută | Pagină |
-|---|---|
-| `/autentificare` | Autentificare |
-| `/inregistrare` | Înregistrare |
-| `/setari` | Setări de profil |
-| `/catalog` | Catalog (pagina de start) |
-| `/produs/:id` | Pagina de produs |
-| `/recomandari` | Recomandate pentru tine |
-| `/profil` | Profilul meu de recomandare |
-| `/evaluare` | Evaluare |
+| Rută | Pagină | Acces |
+|---|---|---|
+| `/autentificare` | Autentificare | doar fără cont |
+| `/inregistrare` | Înregistrare (apoi direct la setări) | doar fără cont |
+| `/setari` | Setări de profil | cu cont |
+| `/catalog` | Catalog (pagina de start) | public |
+| `/produs/:id` | Pagina de produs | public |
+| `/recomandari` | Recomandate pentru tine | cu cont |
+| `/profil` | Profilul meu de recomandare | cu cont |
+| `/evaluare` | Evaluare | public |
 
 ## Cum lucrăm
 
