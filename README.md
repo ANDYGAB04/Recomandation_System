@@ -28,6 +28,38 @@ Echipa: Stoian Cristian-Georgian și Suhan Mihai-Andrei.
 | `PropunereProiect.md` | Propunerea proiectului: cerințe, profilul utilizatorului, algoritmul, arhitectura, evaluarea |
 | `TemaProiect.txt` | Enunțul temei |
 
+## Pornire rapidă
+
+Ai nevoie de **Python 3.11+** și **Node.js 20+**. Pornești două servere, fiecare în terminalul lui, din rădăcina repository-ului.
+
+**Terminalul 1, backendul:**
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate          # pe Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m app.seed --reset         # catalogul, conturile demo și clienții simulați
+uvicorn app.main:app --reload      # http://127.0.0.1:8000 (documentația API: /docs)
+```
+
+**Terminalul 2, frontendul:**
+
+```bash
+cd frontend
+npm install
+npm run dev                        # http://localhost:5173
+```
+
+Deschide http://localhost:5173. În bara de sus, indicatorul „API conectat” arată că frontendul ajunge la backend. Te poți autentifica cu un cont demo:
+
+| Cont | E-mail | Parolă |
+|---|---|---|
+| Maria | `maria@example.com` | `maria2026` |
+| Radu | `radu@example.com` | `radu2026` |
+
+Detaliile pentru fiecare parte sunt mai jos, la [Pornire](#pornire). Scenariul pentru prezentare e la [Scenariul de demonstrație](#scenariul-de-demonstrație-5-minute).
+
 ## Pornire
 
 ### Backend
@@ -204,6 +236,38 @@ Rutele:
 | `/profil` | Profilul meu de recomandare | cu cont |
 | `/istoric` | Favorite și istoric: favoritele, cumpărăturile și ultimele 50 de evenimente | cu cont |
 | `/evaluare` | Evaluare | public |
+
+## Scenariul de demonstrație (~5 minute)
+
+Arată cele trei cerințe de la laborator:
+- recomandarea pe baza profilului;
+- două conturi cu date complet diferite;
+- un cont nou creat de la zero și configurat.
+
+Slide-ul „Demonstrația” din prezentare are aceiași pași.
+
+### Înainte de prezentare
+
+1. Recreează datele, ca să pornești de la aceeași stare: `python -m app.seed --reset` (în `backend/`). Șterge și conturile create la repetiții.
+2. Rulează testele: `python -m pytest` (în `backend/`) și `npm run build` (în `frontend/`).
+3. Pornește cele două servere (vezi [Pornire rapidă](#pornire-rapidă)) și verifică indicatorul „API conectat”.
+
+### Pașii
+
+| # | Ce faci | Ce arăți |
+|---|---|---|
+| 1 | **Autentificare** cu `maria@example.com` / `maria2026`, apoi **Recomandări** | Produse pentru alergare, cele mai multe din linia „Start” pentru începători, toate sub 300 lei. Sub fiecare, explicația: „Pentru că ai ales alergare, buget redus și începător; seamănă cu «Pantofi de alergare pe șosea Ritm Start», din cumpărăturile tale.” |
+| 2 | **Profilul meu** | Din ce se formează profilul: 75% setări, 25% comportament. Interesele dominante: alergare, buget redus, începător, vară. Produsele din istoric. |
+| 3 | **Deconectare**, autentificare cu `radu@example.com` / `radu2026`, **Recomandări** | Listă complet diferită: camping și drumeție de iarnă, echipament rezistent. Primele 10 recomandări ale celor doi nu au niciun produs comun. |
+| 4 | **Deconectare**, **Înregistrare** cu un e-mail nou (de exemplu `demo@example.com`) → **Creează contul** | Contul nou ajunge direct în **Setări profil**. |
+| 5 | Ciclism: **Mult**; nivel **Intermediar**; stil **Ultraușor**; buget **500**; **Salvează setările**, apoi **Recomandări** | Recomandări personalizate imediat, fără istoric: ciclism, sub 500 lei, cu explicații („Pentru că ai ales ciclism și ultraușor”). |
+| 6 | Înapoi în **Setări**: ciclism → **Deloc**, alergare → **Mult**, buget **200** → **Salvează setările**, apoi **Recomandări** | Lista se schimbă complet: alergare, sub 200 lei. |
+| 7 | Deschide un produs din listă → **☆ Adaugă la favorite**, apoi **Recomandări** | Ordinea se schimbă, iar explicațiile pomenesc favoritul („… din favoritele tale”). Un produs cumpărat cu **Cumpără (simulat)** nu mai apare în recomandări. |
+| 8 | **Evaluare** | Recomandarea pe profil găsește de ~1,9 ori mai multe produse relevante decât popularitatea (Recall@5 0,304 față de 0,164) și acoperă ~91% din catalog. Datele sunt sintetice. |
+
+Dacă repeți demonstrația fără `--reset`, folosește alt e-mail la pasul 4.
+
+Verificările făcute pentru acest scenariu, automat prin API și manual în browser, sunt în [docs/testare.md](docs/testare.md).
 
 ## Cum lucrăm
 
