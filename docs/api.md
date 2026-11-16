@@ -125,6 +125,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `POST /interactions`, `GET /me/history` | 11 (CRI-13) | Suhan— gata |
 | `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian — gata |
 | `GET /evaluation` | 20 (CRI-23) | Cristian — gata |
+| `POST /recommendations/feedback`, `GET /recommendations/feedback`, `GET /evaluation/feedback` | 25 (CRI-32) | Cristian — gata |
 
 ### Sistem
 
@@ -354,6 +355,46 @@ Autentificarea e opțională. Cu token, se exclud produsele cumpărate de utiliz
 
 Erori: `404` „Produsul nu există.”, `401` dacă tokenul trimis este invalid (fără token, răspunsul e cel anonim).
 
+### Feedback la recomandări
+
+Răspunsul utilizatorului la întrebarea „Ți-a fost utilă?” de pe fiecare recomandare. Face parte din evaluarea cu utilizatori reali, alături de chestionar (`docs/chestionar.md`).
+
+#### `POST /recommendations/feedback` 🔒
+
+```json
+{ "product_id": 12, "useful": true, "strategy": "personalized" }
+```
+
+`strategy` este câmpul `strategy` al listei din care a venit produsul (`personalized` sau `popular`); implicit `personalized`. Un utilizator are un singur vot per produs: un vot nou îl înlocuiește pe cel vechi.
+
+Răspuns `200`:
+
+```json
+{ "product_id": 12, "useful": true, "strategy": "personalized", "updated_at": "2026-11-16T20:30:00Z" }
+```
+
+Erori: `404` „Produsul nu există.”, `422` pentru o strategie necunoscută.
+
+#### `GET /recommendations/feedback` 🔒
+
+Voturile utilizatorului curent, ca interfața să arate butonul ales: o listă de obiecte ca cel de mai sus.
+
+#### `GET /evaluation/feedback`
+
+Rezumatul public. Numără **doar conturile reale**: nu și conturile demo (Maria, Radu) sau clienții simulați.
+
+```json
+{
+  "votes": 40, "useful": 31, "useful_share": 0.775, "users": 9,
+  "personalized": { "votes": 36, "useful": 30, "useful_share": 0.8333 },
+  "popular": { "votes": 4, "useful": 1, "useful_share": 0.25 }
+}
+```
+
+`useful_share` este `null` când nu există voturi.
+
+**Atenție:** `python -m app.seed --reset` șterge toate datele, inclusiv voturile. După ce participanții încep să răspundă, rulează scriptul fără `--reset`.
+
 ### Evaluare
 
 #### `GET /evaluation`
@@ -421,6 +462,7 @@ Tabelele sunt definite în `backend/app/models.py` și se creează la pornirea A
 | `products` | catalogul; listele (`usages`, `levels`, `styles`, `seasons`, `tags`) sunt JSON |
 | `interactions` | `event_id` (unic), utilizator, produs, tip, moment |
 | `favorites` | starea curentă a favoritelor (utilizator, produs) |
+| `recommendation_feedback` | răspunsul „Ți-a fost utilă?”: utilizator, produs, util (da/nu), strategia, momentele votului; unul per utilizator și produs |
 
 Regulile verificate chiar de baza de date:
 - e-mailul și `event_id` sunt unice;

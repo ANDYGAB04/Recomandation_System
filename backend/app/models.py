@@ -93,3 +93,24 @@ class Favorite(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
     product_id: int = Field(foreign_key="products.id", primary_key=True)
     created_at: datetime = Field(default_factory=utc_now)
+
+
+class RecommendationFeedback(SQLModel, table=True):
+    """Răspunsul utilizatorului la „Ți-a fost utilă?” pentru un produs recomandat.
+
+    Un singur vot per utilizator și produs; un vot nou îl înlocuiește pe cel vechi.
+    """
+
+    __tablename__ = "recommendation_feedback"
+
+    user_id: int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
+    product_id: int = Field(foreign_key="products.id", primary_key=True)
+    useful: bool
+    # Strategia cu care a fost recomandat produsul: „personalized” (profil) sau „popular” (rezervă).
+    strategy: str
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
+
+    __table_args__ = (
+        CheckConstraint("strategy IN ('personalized', 'popular')", name="ck_feedback_strategy"),
+    )

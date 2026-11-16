@@ -1,7 +1,7 @@
 """Formatul JSON al cererilor și răspunsurilor API (vezi docs/api.md)."""
 
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, PlainSerializer, StringConstraints, field_validator
 
@@ -242,3 +242,33 @@ class EvaluationOut(BaseModel):
     selected_config: str
     validation: EvaluationWindow
     test: EvaluationWindow
+
+
+# ---------- Feedback la recomandări ----------
+
+
+class FeedbackIn(BaseModel):
+    product_id: int
+    useful: bool
+    # Strategia listei din care a venit produsul (câmpul `strategy` din GET /recommendations).
+    strategy: Literal["personalized", "popular"] = "personalized"
+
+
+class FeedbackOut(BaseModel):
+    product_id: int
+    useful: bool
+    strategy: str
+    updated_at: UtcDatetime
+
+
+class FeedbackCounts(BaseModel):
+    votes: int
+    useful: int
+    # partea voturilor „util”; null fără voturi
+    useful_share: float | None
+
+
+class FeedbackSummary(FeedbackCounts):
+    users: int
+    personalized: FeedbackCounts
+    popular: FeedbackCounts

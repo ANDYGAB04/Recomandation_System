@@ -229,6 +229,7 @@ materiale-markdown/
 1. Informatii generale - laborator.pptx
 Observatii-Laborator.txt
 CONVERT-TO-MARKDOWN-SKILL.md
+Respectare_Cerinte_Comert_Electronic.png
 
 # Template-ul Python de mai sus ignoră orice director `lib/`;
 # îl permitem în frontend, unde React îl folosește des.

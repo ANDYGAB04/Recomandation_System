@@ -4,8 +4,9 @@ from sqlmodel import select
 
 from ..dependencies import SessionDep
 from ..evaluation import load_and_run
-from ..models import Interaction, Product
-from ..schemas import EvaluationOut
+from ..models import Interaction, Product, RecommendationFeedback, User
+from ..schemas import EvaluationOut, FeedbackCounts, FeedbackSummary
+from ..seed import DEMO_ACCOUNTS, is_simulated_email
 
 router = APIRouter(tags=["evaluare"])
 
@@ -30,3 +31,28 @@ def get_evaluation(request: Request, session: SessionDep) -> EvaluationOut:
             raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=NO_DATA) from None
         state.evaluation_key = key
     return state.evaluation
+
+
+DEMO_EMAILS = {account.email for account in DEMO_ACCOUNTS}
+
+
+def _counts(votes: list[bool]) -> FeedbackCounts:
+    useful = sum(votes)
+    return FeedbackCounts(votes=len(votes), useful=useful, useful_share=round(useful / len(votes), 4) if votes else None)
+
+
+@router.get("/evaluation/feedback")
+def get_feedback_summary(session: SessionDep) -> FeedbackSummary:
+    """Părerea utilizatorilor: câte recomandări au fost votate „utile”, pe strategii.
+
+    Numără doar conturile reale: fără conturile demo (Maria, Radu) și fără clienții simulați.
+    """
+    rows = session.exec(select(RecommendationFeedback, User.email).join(User, User.id == RecommendationFeedback.user_id))
+    real = [(f, email) for f, email in rows if email not in DEMO_EMAILS and not is_simulated_email(email)]
+    overall = _counts([f.useful for f, _ in real])
+    return FeedbackSummary(
+        **overall.model_dump(),
+        users=len({f.user_id for f, _ in real}),
+        personalized=_counts([f.useful for f, _ in real if f.strategy == "personalized"]),
+        popular=_counts([f.useful for f, _ in real if f.strategy == "popular"]),
+    )
