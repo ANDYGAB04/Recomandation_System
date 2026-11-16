@@ -3,7 +3,9 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, EmailStr, Field, PlainSerializer, StringConstraints
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, PlainSerializer, StringConstraints, field_validator
+
+from .vocabulary import Activity, Intensity, Level, Season, Style
 
 
 def _as_utc(value: datetime) -> datetime:
@@ -74,3 +76,35 @@ class ProductPage(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+# ---------- Profil ----------
+
+
+class ProfileIn(BaseModel):
+    """Setările de profil. Un câmp lipsă înseamnă „necompletat”; valorile sunt cele din GET /vocabulary."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    activities: dict[Activity, Intensity] = Field(default_factory=dict)
+    level: Level | None = None
+    styles: list[Style] = Field(default_factory=list)
+    season: Season | None = None
+    max_budget: float | None = Field(default=None, gt=0)
+
+    @field_validator("styles")
+    @classmethod
+    def no_duplicate_styles(cls, styles: list[Style]) -> list[Style]:
+        if len(set(styles)) != len(styles):
+            raise ValueError("Stilurile nu se pot repeta.")
+        return styles
+
+
+class ProfileOut(BaseModel):
+    activities: dict[str, str]
+    level: str | None
+    styles: list[str]
+    season: str | None
+    max_budget: float | None
+    is_complete: bool
+    updated_at: UtcDatetime

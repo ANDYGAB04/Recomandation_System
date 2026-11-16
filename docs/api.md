@@ -120,7 +120,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `GET /vocabulary` | 04 (CRI-8) | Cristian — gata |
 | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` | 07 (CRI-9) | Suhan— gata |
 | `GET /products`, `GET /products/{id}` | 08 (CRI-10) | Suhan — gata |
-| `GET /profile`, `PUT /profile` | 10 (CRI-12) | Suhan |
+| `GET /profile`, `PUT /profile` | 10 (CRI-12) | Suhan— gata |
 | `POST /interactions`, `GET /me/history` | 11 (CRI-13) | Suhan |
 | `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian |
 | `GET /evaluation` | 20 (CRI-23) | Cristian |

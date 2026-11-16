@@ -64,7 +64,7 @@ Structura backendului:
 | `app/schemas.py` | Formatul JSON al cererilor și răspunsurilor (Pydantic) |
 | `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
 | `app/dependencies.py` | Dependențe comune: sesiunea de bază de date (`SessionDep`) și utilizatorul autentificat (`CurrentUserDep`, 401 fără token valid) |
-| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, …) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, `profile.py`, …) |
 | `app/seed/` | Scriptul de inițializare (`python -m app.seed`). `catalog.py` generează cu seed fix ~130 de produse de test: fiecare tip de produs în liniile Start / Activ / Pro |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
 
