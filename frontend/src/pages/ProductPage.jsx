@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import ProductActions from '../components/ProductActions.jsx'
 import RecommendationList from '../components/RecommendationList.jsx'
 import RecommendedStrip from '../components/RecommendedStrip.jsx'
 import Spinner from '../components/Spinner.jsx'
 import { AvailabilityBadge, EmptyState, ErrorState, TestDataBadge } from '../components/Status.jsx'
 import { api, errorMessage } from '../lib/api.js'
+import { useAuth } from '../lib/auth.jsx'
 import { formatPrice } from '../lib/format.js'
+import { newEventId, sendInteraction, useHistory } from '../lib/interactions.js'
 import { useSimilarProducts } from '../lib/recommendations.js'
 import { useVocabulary } from '../lib/vocabulary.js'
 
@@ -15,6 +18,8 @@ export default function ProductPage() {
   const { label } = useVocabulary()
   const [state, setState] = useState({ status: 'loading', product: null, error: null })
   const [reloadKey, setReloadKey] = useState(0)
+  const { isAuthenticated } = useAuth()
+  const history = useHistory()
 
   // „Înapoi la catalog” păstrează filtrele cu care s-a ajuns aici.
   const from = location.state?.from
@@ -31,6 +36,17 @@ export default function ProductPage() {
       active = false
     }
   }, [id, reloadKey])
+
+  // O vizualizare per deschidere a paginii: id-ul evenimentului e legat de navigare (location.key),
+  // deci rularea dublă a efectului (StrictMode) sau o reîncărcare a produsului nu o dublează.
+  const viewIds = useRef({})
+  const loadedId = state.product?.id
+  useEffect(() => {
+    if (!isAuthenticated || loadedId === undefined) return
+    const openKey = `${location.key}:${loadedId}`
+    viewIds.current[openKey] ??= newEventId()
+    sendInteraction(loadedId, 'view', viewIds.current[openKey]).catch(() => {}) // o vizualizare pierdută nu blochează pagina
+  }, [isAuthenticated, loadedId, location.key])
 
   const backLink = (
     <Link to={backTo} className="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:text-emerald-900">
@@ -100,10 +116,10 @@ export default function ProductPage() {
         <aside className="flex flex-col gap-3 rounded-lg bg-gray-50 p-5 lg:self-start">
           <p className="text-3xl font-semibold text-gray-900">{formatPrice(product.price)}</p>
           <AvailabilityBadge available={product.available} />
+          <ProductActions key={product.id} product={product} history={history} />
           <p className="text-xs text-gray-500">
-            Produs fictiv, creat pentru demonstrație. Cumpărarea va fi simulată.
+            Produs fictiv, creat pentru demonstrație. Cumpărarea este simulată: nu se plătește nimic.
           </p>
-          {/* Butoanele de favorite și cumpărare (simulată) se adaugă la pasul 19 (CRI-17). */}
         </aside>
       </article>
 

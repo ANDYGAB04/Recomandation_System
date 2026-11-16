@@ -8,6 +8,7 @@ import CatalogPage from './pages/CatalogPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
 import RecommendationsPage from './pages/RecommendationsPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import HistoryPage from './pages/HistoryPage.jsx'
 import EvaluationPage from './pages/EvaluationPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="setari" element={<SettingsPage />} />
           <Route path="recomandari" element={<RecommendationsPage />} />
           <Route path="profil" element={<ProfilePage />} />
+          <Route path="istoric" element={<HistoryPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

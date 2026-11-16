@@ -10,6 +10,7 @@ const publicLinks = [
 
 const privateLinks = [
   { to: '/recomandari', label: 'Recomandări' },
+  { to: '/istoric', label: 'Favorite' },
   { to: '/profil', label: 'Profilul meu' },
   { to: '/setari', label: 'Setări' },
 ]
@@ -44,8 +45,8 @@ export default function Layout() {
   }
 
   const account = isAuthenticated ? (
-    <div className="flex flex-col gap-2 md:flex-row md:items-center">
-      <span className="px-3 text-sm text-gray-600 md:px-0" title={user.email}>
+    <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+      <span className="px-3 text-sm text-gray-600 lg:px-0" title={user.email}>
         Salut, <span className="font-semibold text-gray-900">{user.display_name}</span>
       </span>
       <button
@@ -73,7 +74,7 @@ export default function Layout() {
               HobbyShop
             </NavLink>
 
-            <div className="hidden items-center gap-1 md:flex">
+            <div className="hidden items-center gap-1 lg:flex">
               {mainLinks.map((link) => (
                 <NavLink key={link.to} to={link.to} className={navClass}>
                   {link.label}
@@ -81,14 +82,14 @@ export default function Layout() {
               ))}
             </div>
 
-            <div className="ml-auto hidden items-center gap-3 md:flex">
+            <div className="ml-auto hidden items-center gap-3 lg:flex">
               <ApiStatus />
               {account}
             </div>
 
             <button
               type="button"
-              className="ml-auto rounded-md p-2 text-gray-700 hover:bg-gray-100 md:hidden"
+              className="ml-auto rounded-md p-2 text-gray-700 hover:bg-gray-100 lg:hidden"
               aria-label={menuOpen ? 'Închide meniul' : 'Deschide meniul'}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((open) => !open)}
@@ -104,7 +105,7 @@ export default function Layout() {
           </div>
 
           {menuOpen && (
-            <div className="mt-3 flex flex-col gap-1 border-t border-gray-100 pt-3 md:hidden">
+            <div className="mt-3 flex flex-col gap-1 border-t border-gray-100 pt-3 lg:hidden">
               {mainLinks.map((link) => (
                 <NavLink key={link.to} to={link.to} className={navClass}>
                   {link.label}
