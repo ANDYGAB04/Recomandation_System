@@ -32,6 +32,8 @@ class ProductType:
     also: tuple[Activity, ...] = ()
     mid_styles: tuple[Style, ...] = (S.COMFORT, S.DURABLE)
     pro_styles: tuple[Style, ...] = (S.PERFORMANCE, S.ULTRALIGHT, S.DURABLE)
+    # Stil fix pentru linia Activ, în locul celui ales aleator din `mid_styles`.
+    activ_style: Style | None = None
 
 
 @dataclass(frozen=True)
@@ -92,15 +94,15 @@ PRODUCT_TYPES: tuple[ProductType, ...] = (
     ProductType("Șapcă de alergare", A.RUNNING, SUMMER, 85, "Șapcă ușoară, cu protecție UV.", ("șapcă", "UV")),
     ProductType("Mănuși de alergare", A.RUNNING, WINTER, 90, "Mănuși subțiri, compatibile cu ecranul tactil.", ("mănuși", "termic")),
     # ---- Ciclism ----
-    ProductType("Cască de bicicletă", A.CYCLING, ALL_YEAR, 330, "Cască ventilată, cu sistem de reglaj.", ("cască", "siguranță"), pro_styles=(S.PERFORMANCE, S.ULTRALIGHT)),
+    ProductType("Cască de bicicletă", A.CYCLING, ALL_YEAR, 330, "Cască ventilată, cu sistem de reglaj.", ("cască", "siguranță"), pro_styles=(S.PERFORMANCE, S.ULTRALIGHT), activ_style=S.ULTRALIGHT),
     ProductType("Mănuși de ciclism", A.CYCLING, SUMMER, 110, "Mănuși cu degete scurte și palme căptușite.", ("mănuși",)),
-    ProductType("Pantaloni scurți cu bazon", A.CYCLING, SUMMER, 260, "Pantaloni scurți cu bazon pentru ture lungi.", ("pantaloni", "bazon")),
+    ProductType("Pantaloni scurți cu bazon", A.CYCLING, SUMMER, 260, "Pantaloni scurți cu bazon pentru ture lungi.", ("pantaloni", "bazon"), activ_style=S.ULTRALIGHT),
     ProductType("Geacă de ciclism de iarnă", A.CYCLING, WINTER, 540, "Geacă izolată, protejează de vânt la coborâri.", ("geacă", "izolat", "vânt")),
     ProductType("Set de lumini LED", A.CYCLING, ALL_YEAR, 140, "Far și stop reîncărcabile prin USB.", ("lumini", "LED", "siguranță")),
-    ProductType("Pompă de mână", A.CYCLING, ALL_YEAR, 90, "Pompă compactă cu manometru.", ("pompă",)),
+    ProductType("Pompă de mână", A.CYCLING, ALL_YEAR, 90, "Pompă compactă cu manometru.", ("pompă",), activ_style=S.ULTRALIGHT),
     ProductType("Trusă de scule multifuncțională", A.CYCLING, ALL_YEAR, 120, "Trusă cu chei, șurubelnițe și extractor de lanț.", ("scule", "reparații")),
     ProductType("Bidon cu suport", A.CYCLING, SUMMER, 60, "Bidon de 750 ml și suport pentru cadru.", ("bidon", "hidratare")),
-    ProductType("Ochelari de ciclism", A.CYCLING, SUMMER, 230, "Ochelari cu lentile interschimbabile și protecție UV.", ("ochelari", "UV"), also=(A.RUNNING,)),
+    ProductType("Ochelari de ciclism", A.CYCLING, SUMMER, 230, "Ochelari cu lentile interschimbabile și protecție UV.", ("ochelari", "UV"), also=(A.RUNNING,), activ_style=S.ULTRALIGHT),
     ProductType("Genți de bikepacking", A.CYCLING, ALL_YEAR, 480, "Set de genți pentru cadru, ghidon și șa.", ("genți", "bikepacking"), also=(A.CAMPING,)),
     ProductType("Lacăt de bicicletă", A.CYCLING, ALL_YEAR, 150, "Lacăt în formă de U, din oțel călit.", ("lacăt", "siguranță"), pro_styles=(S.DURABLE,)),
 )
@@ -125,7 +127,9 @@ def build_catalog(seed: int = CATALOG_SEED) -> list[dict]:
             if line.name == "Start":
                 styles = [S.BUDGET] + ([S.COMFORT] if rng.random() < 0.4 else [])
             elif line.name == "Activ":
-                styles = [rng.choice(ptype.mid_styles)]
+                # Alegerea aleatoare se face oricum, ca restul catalogului (prețuri, stoc) să rămână același.
+                chosen = rng.choice(ptype.mid_styles)
+                styles = [ptype.activ_style or chosen]
             else:
                 styles = [rng.choice(ptype.pro_styles)]
             style_text = ", ".join(LABELS[Style][s].lower() for s in styles)

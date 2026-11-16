@@ -166,6 +166,8 @@ export default function SettingsPage() {
     update('styles', form.styles.includes(style) ? form.styles.filter((s) => s !== style) : [...form.styles, style])
 
   const hasActivity = Object.keys(form.activities).length > 0
+  // Bugetul e doar un filtru: fără nicio preferință, recomandările vin din rezervă (cele mai cumpărate).
+  const hasPreferences = hasActivity || Boolean(form.level) || form.styles.length > 0 || Boolean(form.season)
   const dirty = sameSettingsKey(form) !== sameSettingsKey(saved)
 
   async function handleSubmit(event) {
@@ -212,7 +214,7 @@ export default function SettingsPage() {
 
         <Section
           title="Activități preferate"
-          description="Alege cât de mult practici fiecare activitate. Cel puțin una e necesară pentru recomandări personalizate."
+          description="Alege cât de mult practici fiecare activitate. Activitățile contează cel mai mult în recomandări."
           error={errors.activities}
         >
           <div className="space-y-3">
@@ -330,14 +332,16 @@ export default function SettingsPage() {
                 </span>
               ) : dirty ? (
                 <span className="text-amber-700">Ai modificări nesalvate.</span>
+              ) : !hasPreferences ? (
+                <span className="text-gray-600">Completează setările ca să primești recomandări personalizate.</span>
               ) : !hasActivity ? (
-                <span className="text-gray-600">Alege cel puțin o activitate pentru recomandări personalizate.</span>
+                <span className="text-gray-600">Alege și o activitate: recomandările vor fi mult mai precise.</span>
               ) : (
                 <span className="text-gray-500">Setările sunt la zi.</span>
               )}
             </div>
             <div className="flex gap-2">
-              {!dirty && hasActivity && !confirmation && (
+              {!dirty && hasPreferences && !confirmation && (
                 <Link
                   to="/recomandari"
                   className="rounded-md border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 hover:border-emerald-600 hover:text-emerald-800"
