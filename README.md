@@ -149,7 +149,11 @@ Structura frontendului:
 | `src/components/Form.jsx` | Componente comune de formular (câmp, eroare, buton) |
 | `src/lib/vocabulary.js` | `useVocabulary()`: etichetele în română din `GET /vocabulary` (cerute o singură dată) |
 | `src/lib/format.js` | Formatarea prețurilor (RON) |
-| `src/components/ProductCard.jsx` | Cardul unui produs, folosit în catalog și, mai târziu, la recomandări |
+| `src/components/ProductCard.jsx` | Cardul unui produs, folosit în catalog și la recomandări |
+| `src/components/RecommendationList.jsx` | Lista de recomandări sau de produse similare, cu potrivirea și explicația fiecărui produs și mesajul pentru rezervă |
+| `src/components/RecommendedStrip.jsx` | Secțiunea scurtă „Recomandate pentru tine” din catalog și de pe pagina de produs; pentru vizitatori, invitația de a-și crea cont |
+| `src/lib/recommendations.js` | `useRecommendations` și `useSimilarProducts`: încarcă listele și le reîncarcă la schimbarea contului sau a datelor utilizatorului |
+| `src/lib/userData.js` | `notifyUserDataChanged()`: se apelează după ce utilizatorul salvează setările sau face o acțiune (favorit, cumpărare), ca recomandările afișate să se actualizeze singure |
 | `src/components/Status.jsx` | Stările comune: eroare, listă goală, „Date de test”, disponibilitate |
 | `src/pages/` | Câte o pagină pe rută |
 | `src/index.css` | Tailwind CSS (v4, prin pluginul `@tailwindcss/vite`) |
