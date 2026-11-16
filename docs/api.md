@@ -455,6 +455,71 @@ Un rând din `results`:
 
 Tabelele sunt definite în `backend/app/models.py` și se creează la pornirea API-ului.
 
+```mermaid
+erDiagram
+    users ||--|| user_profiles : "are setările"
+    users ||--o{ interactions : "face"
+    users ||--o{ favorites : "salvează"
+    users ||--o{ recommendation_feedback : "votează"
+    products ||--o{ interactions : "apare în"
+    products ||--o{ favorites : "apare în"
+    products ||--o{ recommendation_feedback : "primește"
+
+    users {
+        int id PK
+        string email UK "unic"
+        string password_hash
+        string display_name
+        datetime created_at
+    }
+    user_profiles {
+        int user_id PK, FK
+        json activities "activitate → intensitate"
+        string level
+        json styles
+        string season
+        float max_budget "> 0"
+        datetime updated_at
+    }
+    products {
+        int id PK
+        string name UK
+        string category
+        json usages
+        json levels
+        json styles
+        json seasons
+        json tags
+        string description
+        float price ">= 0"
+        bool available
+        bool is_test_data
+    }
+    interactions {
+        int id PK
+        string event_id UK "generat de frontend"
+        int user_id FK
+        int product_id FK
+        string type "view, favorite, unfavorite, purchase"
+        datetime created_at
+    }
+    favorites {
+        int user_id PK, FK
+        int product_id PK, FK
+        datetime created_at
+    }
+    recommendation_feedback {
+        int user_id PK, FK
+        int product_id PK, FK
+        bool useful
+        string strategy "personalized, popular"
+        datetime created_at
+        datetime updated_at
+    }
+```
+
+**Comenzile:** o comandă este o cumpărare (simulată), adică un rând în `interactions` cu `type = "purchase"`: utilizatorul, produsul și momentul. Un produs se poate cumpăra o singură dată de același utilizator (`409` la a doua încercare), iar produsele cumpărate nu se mai recomandă.
+
 | Tabelă | Conținut |
 |---|---|
 | `users` | e-mail (unic), hash-ul parolei, nume afișat, data creării |
