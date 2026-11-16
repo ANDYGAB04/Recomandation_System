@@ -147,6 +147,10 @@ Structura frontendului:
 | `src/lib/auth.jsx` | `AuthProvider` și `useAuth()`: contul curent, `login`, `register`, `logout`; token-ul se păstrează în `localStorage` |
 | `src/components/RequireAuth.jsx` | Rutele protejate (fără cont → `/autentificare`) și cele doar pentru vizitatori |
 | `src/components/Form.jsx` | Componente comune de formular (câmp, eroare, buton) |
+| `src/lib/vocabulary.js` | `useVocabulary()`: etichetele în română din `GET /vocabulary` (cerute o singură dată) |
+| `src/lib/format.js` | Formatarea prețurilor (RON) |
+| `src/components/ProductCard.jsx` | Cardul unui produs, folosit în catalog și, mai târziu, la recomandări |
+| `src/components/Status.jsx` | Stările comune: eroare, listă goală, „Date de test”, disponibilitate |
 | `src/pages/` | Câte o pagină pe rută |
 | `src/index.css` | Tailwind CSS (v4, prin pluginul `@tailwindcss/vite`) |
 
@@ -157,7 +161,7 @@ Rutele:
 | `/autentificare` | Autentificare | doar fără cont |
 | `/inregistrare` | Înregistrare (apoi direct la setări) | doar fără cont |
 | `/setari` | Setări de profil | cu cont |
-| `/catalog` | Catalog (pagina de start) | public |
+| `/catalog` | Catalog (pagina de start); filtrele stau în adresă (`?categorie=…&q=…&pret_maxim=…&disponibile=1&pagina=…`) | public |
 | `/produs/:id` | Pagina de produs | public |
 | `/recomandari` | Recomandate pentru tine | cu cont |
 | `/profil` | Profilul meu de recomandare | cu cont |
