@@ -146,3 +146,56 @@ class HistoryOut(BaseModel):
     favorites: list[ProductOut]
     purchases: list[PurchaseOut]
     events: list[EventOut]
+
+
+# ---------- Recomandări ----------
+
+
+class MatchOut(BaseModel):
+    group: str
+    value: str
+    label: str
+
+
+class ExplanationOut(BaseModel):
+    text: str
+    matched: list[MatchOut]
+    because_of: list[ProductRef]
+
+
+class RecommendationOut(BaseModel):
+    product: ProductOut
+    score: float
+    explanation: ExplanationOut
+
+
+class RecommendationsOut(BaseModel):
+    # "personalized" (din profil) sau "popular" (rezervă)
+    strategy: str
+    fallback_reason: str | None
+    items: list[RecommendationOut]
+
+
+class SimilarOut(BaseModel):
+    items: list[RecommendationOut]
+
+
+class ProfileSources(BaseModel):
+    declared: float
+    behavior: float
+
+
+class InterestOut(MatchOut):
+    weight: float
+
+
+class ProfileProductOut(BaseModel):
+    product: ProductRef
+    weight: float
+    events: list[str]
+
+
+class RecommendationProfileOut(BaseModel):
+    sources: ProfileSources
+    interests: list[InterestOut]
+    top_products: list[ProfileProductOut]
