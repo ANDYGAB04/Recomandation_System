@@ -164,7 +164,7 @@ Rutele:
 |---|---|---|
 | `/autentificare` | Autentificare | doar fără cont |
 | `/inregistrare` | Înregistrare (apoi direct la setări) | doar fără cont |
-| `/setari` | Setări de profil | cu cont |
+| `/setari` | Setări de profil: activități cu intensitate, nivel, stiluri, sezon, buget; deschisă automat după înregistrare | cu cont |
 | `/catalog` | Catalog (pagina de start); filtrele stau în adresă (`?categorie=…&q=…&pret_maxim=…&disponibile=1&pagina=…`) | public |
 | `/produs/:id` | Pagina de produs | public |
 | `/recomandari` | Recomandate pentru tine | cu cont |
