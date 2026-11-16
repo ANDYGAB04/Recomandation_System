@@ -87,6 +87,20 @@ def product_text(product: ProductLike) -> str:
     return " ".join([product.name, *product.tags, product.description])
 
 
+def declared_choices(profile: DeclaredProfileLike) -> set[str]:
+    """Caracteristicile alese explicit în setări, fără potrivirile parțiale (nivel vecin, „tot anul”).
+
+    Explicațiile („pentru că ai ales …”) pomenesc doar aceste caracteristici.
+    """
+    choices = {feature(group, a) for a in profile.activities for group in ("category", "usage")}
+    choices |= {feature("style", s) for s in profile.styles}
+    if profile.level:
+        choices.add(feature("level", profile.level))
+    if profile.season:
+        choices.add(feature("season", profile.season))
+    return choices
+
+
 def declared_profile_features(profile: DeclaredProfileLike) -> dict[str, float]:
     """Preferințele din setări, ponderate, în spațiul caracteristicilor produselor."""
     features: dict[str, float] = {}
