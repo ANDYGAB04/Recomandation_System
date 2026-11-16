@@ -43,3 +43,17 @@ def get_current_user(
 
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
+
+
+def get_optional_user(
+    request: Request,
+    session: SessionDep,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+) -> User | None:
+    """Utilizatorul autentificat, dacă cererea are token; None fără token. Un token invalid dă tot 401."""
+    if credentials is None:
+        return None
+    return get_current_user(request, session, credentials)
+
+
+OptionalUserDep = Annotated[User | None, Depends(get_optional_user)]

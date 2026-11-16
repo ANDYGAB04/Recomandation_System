@@ -215,3 +215,56 @@ def _popular_text(count: int) -> str:
     # „1 client”, „5 clienți”, „20 de clienți”
     noun = "client" if count == 1 else ("de clienți" if count % 100 == 0 or count % 100 >= 20 else "clienți")
     return f"Printre cele mai cumpărate: {count} {noun}."
+
+
+@dataclass(frozen=True)
+class ProfileSummary:
+    """Pe ce date se bazează recomandările unui utilizator (pagina „Profilul meu de recomandare”)."""
+
+    declared_share: float
+    behavior_share: float
+    # (preferință, pondere); ponderile tuturor preferințelor din profil însumează 1
+    interests: list[tuple[Match, float]]
+    # (id produs, pondere în profilul din comportament, tipurile de evenimente)
+    top_products: list[tuple[int, float, list[str]]]
+
+
+def profile_summary(
+    rec: ContentRecommender,
+    profile: DeclaredProfileLike | None,
+    history: History,
+    alpha: float = ALPHA,
+    top_interests: int = 8,
+    top_products: int = 5,
+) -> ProfileSummary:
+    declared = rec.declared_profile(profile) if profile is not None else None
+    weights = history.product_weights()
+    behavior = rec.behavior_profile(weights)
+    if declared is not None and behavior is not None:
+        shares = (alpha, 1 - alpha)
+    else:
+        shares = (float(declared is not None), float(behavior is not None))
+
+    interests: list[tuple[Match, float]] = []
+    vector = combine_profiles(declared, behavior, alpha)
+    if vector is not None:
+        totals: dict[Match, float] = {}
+        for index in np.flatnonzero(vector[: rec.n_preference_features] > 0):
+            group, value = split_feature(rec.feature_names[index])
+            match = Match(VOCABULARY_GROUPS[group][0], value)
+            totals[match] = totals.get(match, 0.0) + float(vector[index])
+        total = sum(totals.values())
+        ranked = sorted(totals.items(), key=lambda item: (-item[1], item[0].group, item[0].value))
+        interests = [(match, weight / total) for match, weight in ranked[:top_interests]]
+
+    products = sorted(weights.items(), key=lambda item: (-item[1], item[0]))[:top_products]
+    events = {
+        EventType.PURCHASE: history.purchases,
+        EventType.FAVORITE: history.favorites,
+        EventType.VIEW: history.views,
+    }
+    summary_products = [
+        (pid, weight, [event.value for event, products_with_event in events.items() if pid in products_with_event])
+        for pid, weight in products
+    ]
+    return ProfileSummary(shares[0], shares[1], interests, summary_products)

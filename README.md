@@ -82,10 +82,11 @@ Structura backendului:
 | `app/models.py` | Tabelele bazei de date (`users`, `user_profiles`, `products`, `interactions`, `favorites`) |
 | `app/vocabulary.py` | Valorile permise (activități, nivel, stiluri, sezon, tipuri de evenimente) și etichetele lor |
 | `app/recommender/` | Motorul de recomandare (scikit-learn), independent de baza de date și de API |
+| `app/recommendation_service.py` | Legătura motorului cu baza de date: vectorii produselor (recalculați doar când se schimbă catalogul), profilul, istoricul, popularitatea |
 | `app/schemas.py` | Formatul JSON al cererilor și răspunsurilor (Pydantic) |
 | `app/security.py` | Hash-ul parolelor (bcrypt) și token-urile de autentificare (JWT, valabile 7 zile) |
 | `app/dependencies.py` | Dependențe comune: sesiunea de bază de date (`SessionDep`) și utilizatorul autentificat (`CurrentUserDep`, 401 fără token valid) |
-| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, `profile.py`, `interactions.py`, …) |
+| `app/routers/` | Rutele API, câte un fișier pe zonă (`health.py`, `vocabulary.py`, `auth.py`, `products.py`, `profile.py`, `interactions.py`, `recommendations.py`) |
 | `app/seed/` | Scriptul de inițializare (`python -m app.seed [--reset]`): `catalog.py` (produsele, în liniile Start / Activ / Pro), `demo.py` (Maria și Radu), `simulation.py` (clienții simulați), `timeline.py` (perioada simulată) |
 | `tests/` | Testele pytest; fiecare test folosește o bază de date temporară |
 

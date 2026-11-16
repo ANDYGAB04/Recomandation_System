@@ -43,6 +43,7 @@ Erorile au forma standard FastAPI:
 | `401` | Lipsește autentificarea sau e-mailul ori parola sunt greșite |
 | `404` | Resursa nu există |
 | `409` | Conflict: e-mail deja folosit, produs indisponibil sau deja cumpărat |
+| `503` | Catalogul este gol (recomandări): trebuie rulat `python -m app.seed` |
 | `422` | Date invalide: câmp lipsă, valoare necunoscută, număr negativ |
 
 ## Valorile permise
@@ -122,7 +123,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `GET /products`, `GET /products/{id}` | 08 (CRI-10) | Suhan — gata |
 | `GET /profile`, `PUT /profile` | 10 (CRI-12) | Suhan— gata |
 | `POST /interactions`, `GET /me/history` | 11 (CRI-13) | Suhan— gata |
-| `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian |
+| `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian — gata |
 | `GET /evaluation` | 20 (CRI-23) | Cristian |
 
 ### Sistem
@@ -313,6 +314,8 @@ Parametri: `k` (implicit 10, maximum 50) și `exclude` (id-ul unui produs, se po
 
 Nu se recomandă niciodată produse deja cumpărate, indisponibile, peste `max_budget` sau din `exclude`.
 
+Erori: `401` fără token, `422` pentru `k` în afara intervalului, `503` dacă catalogul este gol.
+
 #### `GET /recommendations/profile` 🔒
 
 Datele pentru pagina „Profilul meu de recomandare”:
@@ -341,7 +344,7 @@ Autentificarea e opțională. Cu token, se exclud produsele cumpărate de utiliz
 }
 ```
 
-Erori: `404` „Produsul nu există.”
+Erori: `404` „Produsul nu există.”, `401` dacă tokenul trimis este invalid (fără token, răspunsul e cel anonim).
 
 ### Evaluare
 
