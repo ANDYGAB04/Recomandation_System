@@ -3,6 +3,8 @@
  *
  *   const { status, data, error, reload } = useRecommendations({ k: 12, exclude: [productId] })
  *   const { status, data, error, reload } = useSimilarProducts(productId, 4)
+ *   const { status, data, error, reload } = useRecommendationProfile()   // GET /recommendations/profile
+ *   const { status, data, error, reload } = useApiResource('/profile')   // orice GET autentificat
  *
  * status: "loading" | "ready" | "error". Listele se reîncarcă singure când se schimbă contul
  * sau când o pagină anunță o schimbare a datelor utilizatorului (vezi userData.js).
@@ -12,7 +14,7 @@ import { api } from './api.js'
 import { useAuth } from './auth.jsx'
 import { useUserDataVersion } from './userData.js'
 
-function useApiResource(path, enabled) {
+export function useApiResource(path, enabled = true) {
   const { token } = useAuth()
   const version = useUserDataVersion()
   const [reloadKey, setReloadKey] = useState(0)
@@ -43,4 +45,8 @@ export function useRecommendations({ k = 12, exclude = [], enabled = true } = {}
 
 export function useSimilarProducts(productId, k = 4) {
   return useApiResource(`/products/${encodeURIComponent(productId)}/similar?k=${k}`, productId != null)
+}
+
+export function useRecommendationProfile() {
+  return useApiResource('/recommendations/profile')
 }
