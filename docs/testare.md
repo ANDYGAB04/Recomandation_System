@@ -43,7 +43,7 @@ Coloana **API** arată verificarea prin API, făcută și automat (`tests/test_f
 | Produsele ultraușoare sunt primele în listă | ✅ | ☐ |
 | Setările apar precompletate după deconectare și o nouă autentificare | ✅ | ☐ |
 
-Observație: doar 3 din primele 10 produse sunt ultraușoare. Toate trei sunt din linia Pro, pentru avansați, pentru că așa e construit catalogul, nu din cauza motorului. Detalii în CRI-30.
+Observație: la prima verificare, doar 3 din primele 10 produse erau ultraușoare, toate din linia Pro, pentru avansați. Cauza era catalogul, nu motorul (CRI-30). După corectare sunt 6 din 10, iar primele trei se potrivesc la toate criteriile: ciclism, ultraușor, intermediar.
 
 ### 2. Schimbarea setărilor
 
@@ -88,8 +88,8 @@ Observație: listele rămân fără produse comune până la 25 de recomandări.
 
 | Problemă | Task | Cine |
 |---|---|---|
-| Bugetul exclude toate produsele: pagina de recomandări spune „Îți arătăm cele mai cumpărate produse”, dar lista e goală | de deschis în Linear | Cristian |
-| Setările spun că fără activitate nu există recomandări personalizate, dar backendul le face din nivel și stil | [CRI-29](https://linear.app/cristianstoian22/issue/CRI-29) | Suhan |
-| Prea puține produse de ciclism ultraușoare pentru nivelul intermediar (scenariul 1) | [CRI-30](https://linear.app/cristianstoian22/issue/CRI-30) | Suhan |
+| Bugetul exclude toate produsele: pagina de recomandări spune „Îți arătăm cele mai cumpărate produse”, dar lista e goală | [CRI-31](https://linear.app/cristianstoian22/issue/CRI-31), rezolvat | Cristian |
+| Setările spun că fără activitate nu există recomandări personalizate, dar backendul le face din nivel și stil | [CRI-29](https://linear.app/cristianstoian22/issue/CRI-29), rezolvat: textul din setări | Suhan |
+| Prea puține produse de ciclism ultraușoare pentru nivelul intermediar (scenariul 1) | [CRI-30](https://linear.app/cristianstoian22/issue/CRI-30), rezolvat: 4 produse de ciclism Activ sunt acum ultraușoare | Suhan |
 
 Niciuna nu blochează demonstrația: toate scenariile trec.
