@@ -201,3 +201,44 @@ class RecommendationProfileOut(BaseModel):
     behavior_breakdown: dict[str, float]
     interests: list[InterestOut]
     top_products: list[ProfileProductOut]
+
+
+# ---------- Evaluare ----------
+
+
+class MetricsOut(BaseModel):
+    precision_at_k: float | None
+    recall_at_k: float | None
+
+
+class EvaluationRow(MetricsOut):
+    config: str
+    # "personalized" (profil) sau "popular"
+    strategy: str
+    alpha: float | None
+    event_weights: str | None
+    coverage: float
+    latency_ms: float | None
+    # utilizatori evaluați (cu istoric înainte de interval)
+    users: int
+    users_without_history: int
+    # metricile pentru utilizatorii fără istoric, raportate separat
+    without_history: MetricsOut
+
+
+class EvaluationWindow(BaseModel):
+    start: str
+    end: str
+    users_total: int
+    users_evaluated: int
+    users_without_relevant: int
+    users_without_history: int
+    results: list[EvaluationRow]
+
+
+class EvaluationOut(BaseModel):
+    k: int
+    note: str
+    selected_config: str
+    validation: EvaluationWindow
+    test: EvaluationWindow

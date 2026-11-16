@@ -7,6 +7,7 @@ from sqlmodel import Session, select
 from app.db import create_db_engine, init_db
 from app.main import create_app
 from app.models import Product
+from app.recommender import ALPHA
 from app.seed import seed_all
 from tests.helpers import auth_header, register_headers
 
@@ -136,7 +137,7 @@ def test_k_is_validated(api):
 
 def test_recommendation_profile_shows_sources_interests_and_products(api):
     data = api.get("/recommendations/profile", headers=login(api, MARIA)).json()
-    assert data["sources"] == {"declared": 0.5, "behavior": 0.5}
+    assert data["sources"] == {"declared": ALPHA, "behavior": 1 - ALPHA}
     # o cumpărare (10), un favorit (5), 4 vizualizări (1 fiecare) → 19
     assert data["behavior_breakdown"] == {"purchase": round(10 / 19, 4), "favorite": round(5 / 19, 4), "view": round(4 / 19, 4)}
     assert data["interests"][0]["label"] == "Alergare"

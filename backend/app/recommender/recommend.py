@@ -12,12 +12,13 @@ from dataclasses import dataclass
 import numpy as np
 
 from ..vocabulary import LABELS, Activity, EventType, Level, Season, Style
-from .behavior import History
+from .behavior import EVENT_WEIGHTS, History
 from .engine import ContentRecommender
 from .features import DeclaredProfileLike, declared_choices, split_feature
 
 # Ponderea datelor declarate în profilul combinat; restul vine din comportament.
-ALPHA = 0.5
+# Aleasă pe validare la evaluarea offline (app/evaluation.py), dintre 0; 0,25; 0,5; 0,75; 1.
+ALPHA = 0.75
 
 PERSONALIZED = "personalized"
 POPULAR = "popular"
@@ -94,12 +95,17 @@ def recommend(
     k: int = 10,
     exclude: Iterable[int] = (),
     alpha: float = ALPHA,
+    event_weights: Mapping[str, float] = EVENT_WEIGHTS,
+    explain: bool = True,
 ) -> RecommendationList:
-    """Recomandările pentru un utilizator. Produsele cumpărate nu se recomandă niciodată."""
+    """Recomandările pentru un utilizator. Produsele cumpărate nu se recomandă niciodată.
+
+    `event_weights` și `explain=False` sunt folosite la evaluare (alte ponderi, fără explicații).
+    """
     excluded = set(exclude) | history.purchased
     max_price = profile.max_budget if profile is not None else None
     declared = rec.declared_profile(profile) if profile is not None else None
-    weights = history.product_weights()
+    weights = history.product_weights(event_weights)
     vector = combine_profiles(declared, rec.behavior_profile(weights), alpha)
     if vector is None:
         return popular(rec, purchase_counts, k, excluded, max_price, NO_PROFILE_REASON)
@@ -107,6 +113,10 @@ def recommend(
     ranked = rec.rank(vector, k, excluded, max_price)
     if not ranked:
         return popular(rec, purchase_counts, k, excluded, max_price, NO_MATCH_REASON)
+    if not explain:
+        return RecommendationList(
+            PERSONALIZED, None, [Recommendation(i.product_id, i.score, Explanation("", [], [])) for i in ranked]
+        )
     choices = declared_choices(profile) if declared is not None else set()
     items = [
         Recommendation(item.product_id, item.score, _explain(rec, declared, choices, weights, history, item.product_id))
