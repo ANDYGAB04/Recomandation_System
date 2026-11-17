@@ -114,3 +114,25 @@ class RecommendationFeedback(SQLModel, table=True):
     __table_args__ = (
         CheckConstraint("strategy IN ('personalized', 'popular')", name="ck_feedback_strategy"),
     )
+
+
+class SurveyResponse(SQLModel, table=True):
+    """Un răspuns la chestionar, anonim: nu are legătură cu contul care l-a trimis."""
+
+    __tablename__ = "survey_responses"
+
+    id: int | None = Field(default=None, primary_key=True)
+    # {"q1": 4, …, "q6": "text"}; întrebările sunt în app/survey.py
+    answers: dict = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
+    created_at: datetime = Field(default_factory=utc_now)
+
+
+class SurveyParticipant(SQLModel, table=True):
+    """Cine a completat deja chestionarul, ca fiecare cont să răspundă o singură dată.
+
+    Separat de răspunsuri, deci răspunsurile rămân anonime.
+    """
+
+    __tablename__ = "survey_participants"
+
+    user_id: int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")

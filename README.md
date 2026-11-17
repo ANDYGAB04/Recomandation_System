@@ -24,6 +24,7 @@ Echipa: Stoian Cristian-Georgian și Suhan Mihai-Andrei.
 | `frontend/` | Aplicația React |
 | `docs/api.md` | Contractul API: endpoint-urile, formatul JSON, valorile permise, tabelele |
 | `docs/testare.md` | Lista de verificare a fluxului complet (cont nou, schimbarea setărilor, comportament, conturile demo, cazuri limită) și rezultatele ei |
+| `docs/chestionar.md` | Chestionarul pentru utilizatori: întrebările, instrucțiunile pentru participanți |
 | `docs/prezentare/Prezentare.pptx` | Prezentarea (partea teoretică): partea 1 Suhan, partea 2 Cristian, în același fișier |
 | `PropunereProiect.md` | Propunerea proiectului: cerințe, profilul utilizatorului, algoritmul, arhitectura, evaluarea |
 | `TemaProiect.txt` | Enunțul temei |
@@ -236,6 +237,7 @@ Rutele:
 | `/recomandari` | Recomandate pentru tine, cu „Ți-a fost utilă?” pe fiecare recomandare | cu cont |
 | `/profil` | Profilul meu de recomandare | cu cont |
 | `/istoric` | Favorite și istoric: favoritele, cumpărăturile și ultimele 50 de evenimente | cu cont |
+| `/chestionar` | Chestionarul pentru evaluarea cu utilizatori (anonim, o dată per cont) | cu cont |
 | `/evaluare` | Evaluare offline și „Părerea utilizatorilor” (rezumatul voturilor din conturile reale) | public |
 
 ## Scenariul de demonstrație (~5 minute)

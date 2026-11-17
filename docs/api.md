@@ -126,6 +126,7 @@ Coloana „Pas” arată task-ul din Linear care implementează endpoint-ul.
 | `GET /recommendations`, `GET /recommendations/profile`, `GET /products/{id}/similar` | 14 (CRI-20) | Cristian — gata |
 | `GET /evaluation` | 20 (CRI-23) | Cristian — gata |
 | `POST /recommendations/feedback`, `GET /recommendations/feedback`, `GET /evaluation/feedback` | 25 (CRI-32) | Cristian — gata |
+| `GET /survey`, `POST /survey` | 28 (CRI-35) | Suhan — gata |
 
 ### Sistem
 
@@ -394,6 +395,43 @@ Rezumatul public. Numără **doar conturile reale**: nu și conturile demo (Mari
 `useful_share` este `null` când nu există voturi.
 
 **Atenție:** `python -m app.seed --reset` șterge toate datele, inclusiv voturile. După ce participanții încep să răspundă, rulează scriptul fără `--reset`.
+
+### Chestionar
+
+Chestionarul pentru evaluarea cu utilizatori reali. Întrebările, instrucțiunile și organizarea sunt în `docs/chestionar.md`; întrebările sunt definite în `backend/app/survey.py`.
+
+#### `GET /survey`
+
+Autentificarea e opțională.
+
+```json
+{
+  "questions": [
+    { "id": "q1", "text": "Cât de potrivite au fost recomandările cu setările pe care le-ai ales?", "kind": "scale", "low": "Deloc potrivite", "high": "Foarte potrivite" },
+    { "id": "q6", "text": "Ce ți-a plăcut, ce ți-a lipsit sau ce ai schimba?", "kind": "open", "low": "", "high": "" }
+  ],
+  "answered": false,
+  "responses": 12
+}
+```
+
+| Câmp | Descriere |
+|---|---|
+| `kind` | `scale` (răspuns întreg de la 1 la 5; `low` și `high` sunt etichetele capetelor) sau `open` (text liber, opțional) |
+| `answered` | `true` dacă utilizatorul autentificat a răspuns deja; `null` fără token |
+| `responses` | Numărul total de răspunsuri |
+
+#### `POST /survey` 🔒
+
+```json
+{ "answers": { "q1": 4, "q2": 5, "q3": 3, "q4": 4, "q5": 5, "q6": "Mi-au plăcut explicațiile." } }
+```
+
+Toate întrebările `scale` sunt obligatorii; `q6` poate lipsi (maximum 1000 de caractere). Răspunsul se salvează **anonim**: contul se notează separat, doar ca să nu răspundă de două ori.
+
+Răspuns `201`: `{ "saved": true }`.
+
+Erori: `401` fără token; `409` „Ai completat deja chestionarul. Mulțumim!”; `422` cu câte o eroare pe întrebare (`loc`: `["body", "answers", "q1"]`), de exemplu „Alege un răspuns.”.
 
 ### Evaluare
 
