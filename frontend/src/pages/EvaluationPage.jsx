@@ -48,6 +48,7 @@ export default function EvaluationPage() {
           message={errorMessage(error)}
           onRetry={reload}
         />
+        <UserFeedback />
       </section>
     )
   }
@@ -75,6 +76,8 @@ export default function EvaluationPage() {
 
       {popularity && profile && <Highlights popularity={popularity} profile={profile} />}
 
+      <UserFeedback />
+
       <ResultsSection
         title={`Rezultatul final (test): ${formatPeriod(test)}`}
         description="Configurația folosită de aplicație, comparată cu popularitatea și cu ponderile inițiale."
@@ -97,6 +100,76 @@ export default function EvaluationPage() {
 
       <Method k={data.k} />
     </section>
+  )
+}
+
+/** Părerea utilizatorilor reali (GET /evaluation/feedback): butoanele „Ți-a fost utilă?” de pe recomandări. */
+function UserFeedback() {
+  const { status, data, error, reload } = useApiResource('/evaluation/feedback')
+
+  const groups = data && [
+    { key: 'personalized', title: 'Recomandări personalizate', hint: 'din profilul utilizatorului', stats: data.personalized, accent: true },
+    { key: 'popular', title: 'Rezervă (cele mai cumpărate)', hint: 'pentru conturi fără setări', stats: data.popular },
+  ]
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm" aria-labelledby="parerea-utilizatorilor">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="parerea-utilizatorilor" className="text-lg font-semibold text-gray-900">
+          Părerea utilizatorilor
+        </h2>
+        {data && (
+          <p className="text-sm text-gray-500">
+            {data.votes === 1 ? '1 vot' : `${data.votes} voturi`} de la{' '}
+            {data.users === 1 ? '1 utilizator' : `${data.users} utilizatori`}
+          </p>
+        )}
+      </div>
+      <p className="mt-1 max-w-3xl text-sm text-gray-600">
+        Răspunsurile la întrebarea „Ți-a fost utilă?” de sub fiecare recomandare. Se numără doar conturile reale, nu
+        și conturile demo sau clienții simulați.
+      </p>
+
+      <div className="mt-4">
+        {status === 'error' ? (
+          <ErrorState title="Nu am putut încărca părerile utilizatorilor." message={errorMessage(error)} onRetry={reload} />
+        ) : !data ? (
+          <Spinner label="Se încarcă voturile…" />
+        ) : data.votes === 0 ? (
+          <p className="rounded-lg border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-600">
+            Niciun vot încă. Răspunde la „Ți-a fost utilă?” pe pagina Recomandări.
+          </p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-3">
+            <FeedbackStat title="Toate recomandările" stats={data} large />
+            {groups.map((group) => (
+              <FeedbackStat key={group.key} title={group.title} hint={group.hint} stats={group.stats} accent={group.accent} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function FeedbackStat({ title, hint, stats, large, accent }) {
+  const share = stats.useful_share
+  return (
+    <div className={`rounded-lg border p-4 ${large ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200'}`}>
+      <p className="text-sm font-medium text-gray-700">{title}</p>
+      {hint && <p className="text-xs text-gray-500">{hint}</p>}
+      <p className={`mt-2 text-3xl font-semibold tabular-nums ${accent || large ? 'text-emerald-800' : 'text-gray-800'}`}>
+        {formatPercent(share)}
+      </p>
+      <p className="text-xs text-gray-600">
+        {share == null ? 'fără voturi' : `utile: ${stats.useful} din ${stats.votes} ${stats.votes === 1 ? 'vot' : 'voturi'}`}
+      </p>
+      {share != null && (
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200" aria-hidden="true">
+          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${Math.round(share * 100)}%` }} />
+        </div>
+      )}
+    </div>
   )
 }
 
