@@ -28,6 +28,14 @@ export default function RecommendationsPage() {
         </div>
       </div>
 
+      <p className="mt-4 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+        <span className="font-semibold">Participi la evaluare?</span> Votează „Ți-a fost utilă?” sub recomandări, apoi{' '}
+        <Link to="/chestionar" className="font-semibold underline hover:text-sky-950">
+          completează chestionarul
+        </Link>{' '}
+        (2 minute, anonim).
+      </p>
+
       <div className="mt-6">
         <RecommendationList
           resource={recommendations}

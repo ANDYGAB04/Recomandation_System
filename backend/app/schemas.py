@@ -272,3 +272,26 @@ class FeedbackSummary(FeedbackCounts):
     users: int
     personalized: FeedbackCounts
     popular: FeedbackCounts
+
+
+# ---------- Chestionar ----------
+
+
+class SurveyQuestionOut(BaseModel):
+    id: str
+    text: str
+    kind: str
+    low: str
+    high: str
+
+
+class SurveyOut(BaseModel):
+    questions: list[SurveyQuestionOut]
+    # true dacă utilizatorul autentificat a completat deja chestionarul; null fără autentificare
+    answered: bool | None
+    responses: int
+
+
+class SurveyAnswersIn(BaseModel):
+    # {"q1": 4, …, "q5": 5, "q6": "text liber, opțional"}
+    answers: dict[str, int | str | None]

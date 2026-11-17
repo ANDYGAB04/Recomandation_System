@@ -128,6 +128,14 @@ export default function Layout() {
 
       <footer className="border-t border-gray-200 bg-white px-4 py-4 text-center text-xs text-gray-500">
         HobbyShop · magazin demonstrativ: toate produsele, conturile și cumpărăturile sunt date de test.
+        {isAuthenticated && (
+          <>
+            {' · '}
+            <NavLink to="/chestionar" className="font-medium text-emerald-700 hover:text-emerald-900">
+              Chestionar
+            </NavLink>
+          </>
+        )}
       </footer>
     </div>
   )

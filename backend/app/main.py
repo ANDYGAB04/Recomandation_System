@@ -12,7 +12,7 @@ from sqlmodel import Session
 from .config import Settings, get_settings
 from .db import create_db_engine, init_db
 from .recommendation_service import get_recommender
-from .routers import auth, evaluation, health, interactions, products, profile, recommendations, vocabulary
+from .routers import auth, evaluation, health, interactions, products, profile, recommendations, survey, vocabulary
 
 
 def _warm_up_recommender(app: FastAPI) -> None:
@@ -57,6 +57,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(interactions.router)
     app.include_router(recommendations.router)
     app.include_router(evaluation.router)
+    app.include_router(survey.router)
     return app
 
 
