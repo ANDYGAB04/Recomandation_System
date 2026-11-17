@@ -32,6 +32,7 @@ export default function RecommendationsPage() {
         <RecommendationList
           resource={recommendations}
           skeletonCount={8}
+          withFeedback
           emptyState={
             <EmptyState
               title="Niciun produs nu se potrivește profilului tău."

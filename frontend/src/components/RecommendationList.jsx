@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import FeedbackButtons from './FeedbackButtons.jsx'
 import ProductCard from './ProductCard.jsx'
 import { EmptyState, ErrorState } from './Status.jsx'
 import { errorMessage } from '../lib/api.js'
@@ -7,8 +8,9 @@ import { errorMessage } from '../lib/api.js'
  * Cardul unui produs recomandat: cardul obișnuit, plus potrivirea și explicația.
  * `scoreLabel` (de exemplu „Potrivire” sau „Asemănare”) lipsește pentru rezerva pe popularitate,
  * unde scorul este numărul de cumpărători, nu o similaritate.
+ * Cu `strategy` (lista din care vine produsul), cardul are și întrebarea „Ți-a fost utilă?”.
  */
-export function RecommendationCard({ item, scoreLabel }) {
+export function RecommendationCard({ item, scoreLabel, strategy }) {
   const { product, score, explanation } = item
   return (
     <ProductCard product={product}>
@@ -20,6 +22,7 @@ export function RecommendationCard({ item, scoreLabel }) {
         )}
         <p className="mt-1 text-sm leading-snug text-gray-600">{explanation.text}</p>
       </div>
+      {strategy && <FeedbackButtons productId={product.id} strategy={strategy} />}
     </ProductCard>
   )
 }
@@ -44,8 +47,16 @@ export function FallbackNotice({ reason }) {
 /**
  * Lista de recomandări cu toate stările ei: încărcare, eroare, listă goală, rezervă.
  * `resource` vine din useRecommendations / useSimilarProducts.
+ * `withFeedback`: arată „Ți-a fost utilă?” pe fiecare card (recomandări, nu și produse similare).
  */
-export default function RecommendationList({ resource, scoreLabel = 'Potrivire', columns = 4, skeletonCount = 4, emptyState }) {
+export default function RecommendationList({
+  resource,
+  scoreLabel = 'Potrivire',
+  columns = 4,
+  skeletonCount = 4,
+  emptyState,
+  withFeedback = false,
+}) {
   const { status, data, error, reload } = resource
   const grid = `grid gap-4 sm:grid-cols-2 ${columns >= 3 ? 'lg:grid-cols-3' : ''} ${columns >= 4 ? 'xl:grid-cols-4' : ''}`
 
@@ -87,7 +98,11 @@ export default function RecommendationList({ resource, scoreLabel = 'Potrivire',
         <ul className={`${grid} ${status === 'loading' ? 'opacity-60 transition-opacity' : ''}`} aria-busy={status === 'loading'}>
           {data.items.map((item) => (
             <li key={item.product.id}>
-              <RecommendationCard item={item} scoreLabel={popular ? null : scoreLabel} />
+              <RecommendationCard
+                item={item}
+                scoreLabel={popular ? null : scoreLabel}
+                strategy={withFeedback ? data.strategy : undefined}
+              />
             </li>
           ))}
         </ul>

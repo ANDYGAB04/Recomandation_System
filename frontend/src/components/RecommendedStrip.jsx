@@ -43,7 +43,7 @@ export default function RecommendedStrip({ title = 'Recomandate pentru tine', co
         </Link>
       </div>
       <div className="mt-3">
-        <RecommendationList resource={recommendations} skeletonCount={count} />
+        <RecommendationList resource={recommendations} skeletonCount={count} withFeedback />
       </div>
     </section>
   )
