@@ -183,6 +183,12 @@ Concluziile:
 
 **Datele sunt sintetice:** rezultatele descriu comportamentul simulatorului din `app/seed/simulation.py`, nu preferințe reale.
 
+#### Evaluarea cu utilizatori
+
+Pentru evaluarea cu utilizatori, aplicația are butoanele „Ți-a fost utilă?” de sub recomandări și un chestionar anonim (`/chestionar`, întrebările în `docs/chestionar.md`).
+
+**Participanți reali: 0.** Colectarea nu a avut loc. `python -m app.seed` adaugă **date de test**: 12 răspunsuri la chestionar și 60 de voturi de la clienți simulați. Sunt marcate „Date de test” peste tot și nu le prezentăm ca rezultate. Analiza lor, cu motivul pentru care nu spun nimic despre metodă, e în `docs/chestionar.md`, la „Rezultate”.
+
 ### Frontend
 
 Necesită Node.js 20 sau mai nou. Din directorul `frontend/`:
@@ -266,7 +272,7 @@ Slide-ul „Demonstrația” din prezentare are aceiași pași.
 | 5 | Ciclism: **Mult**; nivel **Intermediar**; stil **Ultraușor**; buget **500**; **Salvează setările**, apoi **Recomandări** | Recomandări personalizate imediat, fără istoric: ciclism, sub 500 lei, cu explicații („Pentru că ai ales ciclism și ultraușor”). |
 | 6 | Înapoi în **Setări**: ciclism → **Deloc**, alergare → **Mult**, buget **200** → **Salvează setările**, apoi **Recomandări** | Lista se schimbă complet: alergare, sub 200 lei. |
 | 7 | Deschide un produs din listă → **☆ Adaugă la favorite**, apoi **Recomandări** | Ordinea se schimbă, iar explicațiile pomenesc favoritul („… din favoritele tale”). Un produs cumpărat cu **Cumpără (simulat)** nu mai apare în recomandări. |
-| 8 | **Evaluare** | Recomandarea pe profil găsește de ~1,9 ori mai multe produse relevante decât popularitatea (Recall@5 0,304 față de 0,164) și acoperă ~91% din catalog. Datele sunt sintetice. |
+| 8 | **Evaluare** | Recomandarea pe profil găsește de ~1,9 ori mai multe produse relevante decât popularitatea (Recall@5 0,304 față de 0,164) și acoperă ~91% din catalog. Datele sunt sintetice. Sub „Părerea utilizatorilor”, voturile de test au eticheta „Date de test”: 0 participanți reali. |
 
 Dacă repeți demonstrația fără `--reset`, folosește alt e-mail la pasul 4.
 

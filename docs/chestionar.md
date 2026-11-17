@@ -109,7 +109,44 @@ Fișierul are o linie pe răspuns: `raspuns`, `sursa` (`real` sau `date de test`
 
 Ca paginile să nu fie goale înainte de colectare, `python -m app.seed` adaugă și **date de test**, generate automat, nu de persoane reale:
 
-- 12 răspunsuri la chestionar, salvate cu `is_test_data = true`. Unele comentarii încep cu „[date de test]”.
+- 12 răspunsuri la chestionar, salvate cu `is_test_data = true`. Comentariile care nu sunt goale încep cu „[date de test]”.
 - câte 5 voturi „Ți-a fost utilă?” pentru primii 12 clienți simulați, pe recomandările calculate pentru ei. Votul „util” e mai probabil când scorul recomandării e mai mare.
 
 Datele de test sunt numărate separat peste tot: în `GET /survey` (`test_responses`), în `GET /evaluation/feedback` (`test_data`), în export (coloana `sursa`) și pe pagina Evaluare, unde au eticheta „Date de test”. **Nu le prezentăm ca rezultate ale evaluării cu utilizatori.** Scriptul le adaugă o singură dată; rularea repetată nu le dublează.
+
+## Rezultate (pasul 30)
+
+**Participanți reali: 0.** Colectarea cu utilizatori reali nu a avut loc, așa că nu avem rezultate ale evaluării cu utilizatori. Tot ce urmează sunt **date de test**, generate de `python -m app.seed`. Ele arată doar că instrumentele funcționează de la un capăt la altul: chestionarul, voturile, exportul și calculele.
+
+### Chestionarul (date de test)
+
+12 răspunsuri de test, din `docs/chestionar-raspunsuri.csv` (`sursa = date de test`):
+
+| # | Ce verifică | Media (1–5) |
+|---|---|---|
+| q1 | Potrivirea cu setările | 4,17 |
+| q2 | Claritatea explicațiilor | 3,92 |
+| q3 | Adaptarea la schimbarea setărilor | 3,58 |
+| q4 | Intenția de cumpărare | 4,08 |
+| q5 | Ușurința de folosire | 3,50 |
+
+Răspunsurile de test sunt alese aleatoriu din {2, 3, 4, 4, 5, 5}. Diferențele dintre întrebări nu spun nimic despre aplicație.
+
+La q6, 9 răspunsuri de test au comentariu și 3 sunt goale. Sunt 3 comentarii diferite (despre explicații, buget și filtre), repetate, și toate încep cu „[date de test]”.
+
+### „Ți-a fost utilă?” (date de test)
+
+Din `GET /evaluation/feedback`, câmpul `test_data`:
+
+| Recomandări | Voturi | Utile |
+|---|---|---|
+| Toate | 60 (12 clienți simulați) | 51 (85%) |
+| Personalizate | 60 | 51 (85%) |
+| Rezervă (popularitate) | 0 | – |
+
+Voturile de test sunt date pe recomandările calculate chiar de aplicație. Un vot „util” e mai probabil când scorul recomandării e mai mare (probabilitate 0,45 + 0,5 × scor). Procentul depinde deci de această regulă, nu de părerea cuiva. Clienții simulați au istoric, așa că primesc recomandări personalizate; de aceea rezerva nu are voturi.
+
+### Ce înseamnă
+
+- Evaluarea cu utilizatori nu confirmă și nu infirmă metoda: nu avem păreri reale. Singura evaluare cu rezultate este cea **offline** (README, „Evaluarea offline”): Recall@5 0,304 față de 0,164 la popularitate, pe date sintetice.
+- Instrumentul e gata. Cu cel puțin 8 participanți reali, comenzile de mai sus (`python -m app.survey_export` și pagina Evaluare) dau rezultatele reale, separat de datele de test. Tabelele de aici se refac atunci cu cifrele reale.
