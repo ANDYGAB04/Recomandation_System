@@ -55,11 +55,12 @@ def test_invalid_feedback_is_rejected(api):
 
 
 def test_summary_counts_votes_per_strategy(api):
-    assert api.get("/evaluation/feedback").json() == {
+    empty = {
         "votes": 0, "useful": 0, "useful_share": None, "users": 0,
         "personalized": {"votes": 0, "useful": 0, "useful_share": None},
         "popular": {"votes": 0, "useful": 0, "useful_share": None},
     }
+    assert api.get("/evaluation/feedback").json() == {**empty, "test_data": empty}
     ana, ion = register_headers(api, email="ana2@example.com"), register_headers(api, email="ion2@example.com")
     vote(api, ana, 1, True)
     vote(api, ana, 2, False)

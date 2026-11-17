@@ -19,7 +19,9 @@ from .models import SurveyResponse
 from .survey import QUESTIONS, SCALE_IDS
 
 DEFAULT_OUT = BACKEND_DIR.parent / "docs" / "chestionar-raspunsuri.csv"
-COLUMNS = ["raspuns", "data", *(q.id for q in QUESTIONS)]
+# `sursa`: „real” (participant) sau „date de test” (generat de python -m app.seed).
+COLUMNS = ["raspuns", "sursa", "data", *(q.id for q in QUESTIONS)]
+REAL, TEST = "real", "date de test"
 
 
 def rows(session: Session) -> list[dict]:
@@ -27,6 +29,7 @@ def rows(session: Session) -> list[dict]:
     return [
         {
             "raspuns": number,
+            "sursa": TEST if response.is_test_data else REAL,
             # Doar ziua: ora exactă ar putea ajuta la identificarea participanților.
             "data": response.created_at.date().isoformat(),
             **{q.id: response.answers.get(q.id, "") for q in QUESTIONS},
@@ -65,10 +68,15 @@ def main() -> None:
     engine.dispose()
 
     write_csv(data, args.out)
-    print(f"{len(data)} răspunsuri exportate în {args.out}")
+    real = [row for row in data if row["sursa"] == REAL]
+    test = [row for row in data if row["sursa"] == TEST]
+    print(f"{len(data)} răspunsuri exportate în {args.out}: {len(real)} reale, {len(test)} date de test")
     texts = {q.id: q.text for q in QUESTIONS}
-    for qid, average in averages(data).items():
-        print(f"  {qid} (medie {'–' if average is None else average}): {texts[qid]}")
+    for label, group in (("REALE", real), ("DATE DE TEST (generate, nu de la participanți)", test)):
+        if group:
+            print(f"Medii — {label}:")
+            for qid, average in averages(group).items():
+                print(f"  {qid} (medie {'–' if average is None else average}): {texts[qid]}")
 
 
 if __name__ == "__main__":

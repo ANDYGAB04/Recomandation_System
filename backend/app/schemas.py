@@ -268,10 +268,16 @@ class FeedbackCounts(BaseModel):
     useful_share: float | None
 
 
-class FeedbackSummary(FeedbackCounts):
+class FeedbackGroups(FeedbackCounts):
     users: int
     personalized: FeedbackCounts
     popular: FeedbackCounts
+
+
+class FeedbackSummary(FeedbackGroups):
+    """Voturile reale, plus separat voturile de test ale clienților simulați."""
+
+    test_data: FeedbackGroups
 
 
 # ---------- Chestionar ----------
@@ -289,7 +295,10 @@ class SurveyOut(BaseModel):
     questions: list[SurveyQuestionOut]
     # true dacă utilizatorul autentificat a completat deja chestionarul; null fără autentificare
     answered: bool | None
+    # răspunsurile reale (de la participanți)
     responses: int
+    # răspunsurile generate ca date de test (`python -m app.seed`), numărate separat
+    test_responses: int = 0
 
 
 class SurveyAnswersIn(BaseModel):

@@ -48,8 +48,9 @@ def validate_answers(answers: dict) -> dict:
     return clean
 
 
-def _count(session) -> int:
-    return session.exec(select(func.count()).select_from(SurveyResponse)).one()
+def _count(session, test_data: bool = False) -> int:
+    query = select(func.count()).select_from(SurveyResponse).where(SurveyResponse.is_test_data == test_data)
+    return session.exec(query).one()
 
 
 @router.get("")
@@ -60,6 +61,7 @@ def get_survey(session: SessionDep, user: OptionalUserDep) -> SurveyOut:
         questions=[SurveyQuestionOut(id=q.id, text=q.text, kind=q.kind, low=q.low, high=q.high) for q in QUESTIONS],
         answered=answered,
         responses=_count(session),
+        test_responses=_count(session, test_data=True),
     )
 
 

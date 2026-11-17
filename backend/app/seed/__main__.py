@@ -33,6 +33,8 @@ def main() -> None:
     print(f"Baza de date: {settings.database_file}")
     print(f"Catalog: {summary.products_created} produse noi, {summary.products_updated} actualizate.")
     print(f"Conturi demo create: {summary.demo_accounts_created}; clienți simulați creați: {summary.simulated_customers_created}.")
+    print(f"Date de test pentru evaluarea cu utilizatori: {summary.test_survey_responses_created} răspunsuri la chestionar, "
+          f"{summary.test_votes_created} voturi „Ți-a fost utilă?” (marcate ca date de test, separate de cele reale).")
     for account in DEMO_ACCOUNTS:
         print(f"  {account.display_name}: {account.email} / {account.password}")
 

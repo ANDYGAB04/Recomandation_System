@@ -91,7 +91,7 @@ Pe Windows, în PowerShell: `$env:VITE_API_URL="http://ADRESA:8000"`, apoi `npm 
 
 - [ ] Aplicația pornită ca mai sus și verificată de pe un alt dispozitiv.
 - [ ] Instrucțiunile și linkul trimise de amândoi (Suhan coordonează).
-- [ ] Cel puțin **8 participanți** au completat chestionarul. Numărul de răspunsuri apare în `GET /survey` (câmpul `responses`).
+- [ ] Cel puțin **8 participanți** au completat chestionarul. Numărul de răspunsuri reale apare în `GET /survey` (câmpul `responses`; datele de test sunt numărate separat, în `test_responses`).
 - [ ] Voturile „Ți-a fost utilă?” apar pe pagina Evaluare, la „Părerea utilizatorilor”.
 - [ ] Răspunsurile exportate în `docs/chestionar-raspunsuri.csv` (vezi mai jos) și adăugate în repository.
 - [ ] Baza de date folosită (`backend/data/hobbyshop.db`) păstrată pentru analiza de la pasul 30, **fără `--reset`**.
@@ -103,4 +103,13 @@ cd backend
 python -m app.survey_export          # scrie docs/chestionar-raspunsuri.csv
 ```
 
-Fișierul are o linie pe răspuns: `raspuns`, `data` (doar ziua), `q1`–`q5`, `q6`. Nu conține date personale. Comanda afișează și media fiecărei întrebări pe scală.
+Fișierul are o linie pe răspuns: `raspuns`, `sursa` (`real` sau `date de test`), `data` (doar ziua), `q1`–`q5`, `q6`. Nu conține date personale. Comanda afișează câte răspunsuri sunt reale și câte de test și media fiecărei întrebări pe scală, separat pentru fiecare.
+
+### Datele de test
+
+Ca paginile să nu fie goale înainte de colectare, `python -m app.seed` adaugă și **date de test**, generate automat, nu de persoane reale:
+
+- 12 răspunsuri la chestionar, salvate cu `is_test_data = true`. Unele comentarii încep cu „[date de test]”.
+- câte 5 voturi „Ți-a fost utilă?” pentru primii 12 clienți simulați, pe recomandările calculate pentru ei. Votul „util” e mai probabil când scorul recomandării e mai mare.
+
+Datele de test sunt numărate separat peste tot: în `GET /survey` (`test_responses`), în `GET /evaluation/feedback` (`test_data`), în export (coloana `sursa`) și pe pagina Evaluare, unde au eticheta „Date de test”. **Nu le prezentăm ca rezultate ale evaluării cu utilizatori.** Scriptul le adaugă o singură dată; rularea repetată nu le dublează.

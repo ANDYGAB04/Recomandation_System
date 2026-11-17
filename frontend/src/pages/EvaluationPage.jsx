@@ -1,5 +1,5 @@
 import Spinner from '../components/Spinner.jsx'
-import { ErrorState } from '../components/Status.jsx'
+import { ErrorState, TestDataBadge } from '../components/Status.jsx'
 import { errorMessage } from '../lib/api.js'
 import { useApiResource } from '../lib/recommendations.js'
 
@@ -148,7 +148,32 @@ function UserFeedback() {
           </div>
         )}
       </div>
+
+      {data && data.test_data?.votes > 0 && <TestFeedback stats={data.test_data} />}
     </section>
+  )
+}
+
+/** Voturile generate de seed pentru clienții simulați: afișate separat și marcate, ca să nu fie confundate cu cele reale. */
+function TestFeedback({ stats }) {
+  return (
+    <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50/60 p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <TestDataBadge />
+        <p className="text-sm font-medium text-amber-900">
+          Voturi generate automat de scriptul de inițializare (seed) pentru {stats.users} clienți simulați
+        </p>
+      </div>
+      <p className="mt-1 text-xs text-amber-900/80">
+        Nu sunt păreri ale unor persoane reale. Arată doar cum se completează secțiunea de mai sus și nu intră în
+        rezultatele evaluării.
+      </p>
+      <div className="mt-3 grid gap-4 md:grid-cols-3">
+        <FeedbackStat title="Toate (date de test)" stats={stats} />
+        <FeedbackStat title="Personalizate (date de test)" stats={stats.personalized} />
+        <FeedbackStat title="Rezervă (date de test)" stats={stats.popular} />
+      </div>
+    </div>
   )
 }
 
