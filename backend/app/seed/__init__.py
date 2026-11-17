@@ -3,7 +3,8 @@
     python -m app.seed            # din directorul backend/: completează ce lipsește
     python -m app.seed --reset    # șterge toate datele și le recreează (de exemplu înainte de prezentare)
 
-Încarcă catalogul, cele două conturi demonstrative (Maria și Radu) și clienții simulați.
+Încarcă catalogul, cele două conturi demonstrative (Maria și Radu), clienții simulați și date de test
+pentru evaluarea cu utilizatori (voturi și răspunsuri la chestionar, marcate ca date de test).
 """
 
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ from ..db import init_db
 from ..models import Product
 from .catalog import CATALOG_SEED, build_catalog
 from .demo import DEMO_ACCOUNTS, seed_demo_accounts
+from .feedback_test_data import seed_feedback_test_data
 from .simulation import SIMULATED_CUSTOMERS, SIMULATION_SEED, is_simulated_email, seed_simulated_customers
 
 __all__ = [
@@ -54,6 +56,8 @@ class SeedSummary:
     products_updated: int
     demo_accounts_created: int
     simulated_customers_created: int
+    test_survey_responses_created: int = 0
+    test_votes_created: int = 0
 
 
 def seed_all(
@@ -63,7 +67,8 @@ def seed_all(
     created, updated = seed_catalog(session)
     demo = seed_demo_accounts(session)
     simulated = seed_simulated_customers(session, customers, simulation_seed)
-    return SeedSummary(created, updated, demo, simulated)
+    survey_responses, votes = seed_feedback_test_data(session)
+    return SeedSummary(created, updated, demo, simulated, survey_responses, votes)
 
 
 def reset_database(engine: Engine) -> None:

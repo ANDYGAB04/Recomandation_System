@@ -382,13 +382,18 @@ Voturile utilizatorului curent, ca interfața să arate butonul ales: o listă d
 
 #### `GET /evaluation/feedback`
 
-Rezumatul public. Numără **doar conturile reale**: nu și conturile demo (Maria, Radu) sau clienții simulați.
+Rezumatul public. Câmpurile de sus numără **doar conturile reale**: nu și conturile demo (Maria, Radu) sau clienții simulați. Voturile clienților simulați sunt **date de test** generate de `python -m app.seed` și apar separat, în `test_data`, cu aceeași structură.
 
 ```json
 {
   "votes": 40, "useful": 31, "useful_share": 0.775, "users": 9,
   "personalized": { "votes": 36, "useful": 30, "useful_share": 0.8333 },
-  "popular": { "votes": 4, "useful": 1, "useful_share": 0.25 }
+  "popular": { "votes": 4, "useful": 1, "useful_share": 0.25 },
+  "test_data": {
+    "votes": 60, "useful": 41, "useful_share": 0.6833, "users": 12,
+    "personalized": { "votes": 60, "useful": 41, "useful_share": 0.6833 },
+    "popular": { "votes": 0, "useful": 0, "useful_share": null }
+  }
 }
 ```
 
@@ -411,7 +416,8 @@ Autentificarea e opțională.
     { "id": "q6", "text": "Ce ți-a plăcut, ce ți-a lipsit sau ce ai schimba?", "kind": "open", "low": "", "high": "" }
   ],
   "answered": false,
-  "responses": 12
+  "responses": 9,
+  "test_responses": 12
 }
 ```
 
@@ -419,7 +425,8 @@ Autentificarea e opțională.
 |---|---|
 | `kind` | `scale` (răspuns întreg de la 1 la 5; `low` și `high` sunt etichetele capetelor) sau `open` (text liber, opțional) |
 | `answered` | `true` dacă utilizatorul autentificat a răspuns deja; `null` fără token |
-| `responses` | Numărul total de răspunsuri |
+| `responses` | Numărul de răspunsuri reale (de la participanți) |
+| `test_responses` | Numărul de răspunsuri de test generate de `python -m app.seed`; nu intră în `responses` |
 
 #### `POST /survey` 🔒
 

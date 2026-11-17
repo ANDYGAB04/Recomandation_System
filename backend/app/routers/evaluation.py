@@ -5,7 +5,7 @@ from sqlmodel import select
 from ..dependencies import SessionDep
 from ..evaluation import load_and_run
 from ..models import Interaction, Product, RecommendationFeedback, User
-from ..schemas import EvaluationOut, FeedbackCounts, FeedbackSummary
+from ..schemas import EvaluationOut, FeedbackCounts, FeedbackGroups, FeedbackSummary
 from ..seed import DEMO_ACCOUNTS, is_simulated_email
 
 router = APIRouter(tags=["evaluare"])
@@ -45,14 +45,20 @@ def _counts(votes: list[bool]) -> FeedbackCounts:
 def get_feedback_summary(session: SessionDep) -> FeedbackSummary:
     """Părerea utilizatorilor: câte recomandări au fost votate „utile”, pe strategii.
 
-    Numără doar conturile reale: fără conturile demo (Maria, Radu) și fără clienții simulați.
+    Câmpurile principale numără doar conturile reale: fără conturile demo (Maria, Radu) și fără clienții
+    simulați. Voturile de test ale clienților simulați sunt separat, în `test_data`.
     """
-    rows = session.exec(select(RecommendationFeedback, User.email).join(User, User.id == RecommendationFeedback.user_id))
-    real = [(f, email) for f, email in rows if email not in DEMO_EMAILS and not is_simulated_email(email)]
-    overall = _counts([f.useful for f, _ in real])
-    return FeedbackSummary(
-        **overall.model_dump(),
-        users=len({f.user_id for f, _ in real}),
-        personalized=_counts([f.useful for f, _ in real if f.strategy == "personalized"]),
-        popular=_counts([f.useful for f, _ in real if f.strategy == "popular"]),
+    rows = list(session.exec(select(RecommendationFeedback, User.email).join(User, User.id == RecommendationFeedback.user_id)))
+    real = [f for f, email in rows if email not in DEMO_EMAILS and not is_simulated_email(email)]
+    # Voturile de test (python -m app.seed) vin de la clienții simulați și se raportează separat.
+    test = [f for f, email in rows if is_simulated_email(email)]
+    return FeedbackSummary(**_groups(real).model_dump(), test_data=_groups(test))
+
+
+def _groups(votes: list[RecommendationFeedback]) -> FeedbackGroups:
+    return FeedbackGroups(
+        **_counts([f.useful for f in votes]).model_dump(),
+        users=len({f.user_id for f in votes}),
+        personalized=_counts([f.useful for f in votes if f.strategy == "personalized"]),
+        popular=_counts([f.useful for f in votes if f.strategy == "popular"]),
     )

@@ -125,6 +125,8 @@ class SurveyResponse(SQLModel, table=True):
     # {"q1": 4, …, "q6": "text"}; întrebările sunt în app/survey.py
     answers: dict = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
     created_at: datetime = Field(default_factory=utc_now)
+    # true pentru răspunsurile generate de scriptul de inițializare (date de test), nu de participanți reali
+    is_test_data: bool = False
 
 
 class SurveyParticipant(SQLModel, table=True):
