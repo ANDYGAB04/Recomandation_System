@@ -1,10 +1,4 @@
-/**
- * Starea de autentificare: token-ul (păstrat în localStorage) și contul curent.
- *
- *   const { user, status, login, register, logout } = useAuth()
- *
- * status: "loading" cât timp verificăm token-ul salvat, apoi "ready".
- */
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { api, setAuthToken, setUnauthorizedHandler } from './api.js'
 
@@ -23,7 +17,7 @@ function writeToken(token) {
     if (token) localStorage.setItem(TOKEN_KEY, token)
     else localStorage.removeItem(TOKEN_KEY)
   } catch {
-    // Fără localStorage (de exemplu, fereastră privată): sesiunea ține până la reîncărcare.
+    
   }
 }
 
@@ -32,7 +26,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => {
     const saved = readToken()
-    setAuthToken(saved) // înainte de primul render, ca cererile copiilor să aibă token
+    setAuthToken(saved) 
     return saved
   })
   const [user, setUser] = useState(null)
@@ -50,20 +44,20 @@ export function AuthProvider({ children }) {
     setStatus('ready')
   }, [applyToken])
 
-  // Token expirat sau invalid la orice cerere → deconectare.
+  
   useEffect(() => {
     setUnauthorizedHandler(logout)
     return () => setUnauthorizedHandler(null)
   }, [logout])
 
-  // La pornire: verificăm token-ul salvat și încărcăm contul.
+  
   useEffect(() => {
     if (!token || user) return
     let active = true
     api
       .get('/auth/me')
       .then((me) => active && setUser(me))
-      // 401: token expirat → deconectare. API indisponibil: păstrăm token-ul pentru următoarea încercare.
+      
       .catch((error) => active && error.status === 401 && logout())
       .finally(() => active && setStatus('ready'))
     return () => {

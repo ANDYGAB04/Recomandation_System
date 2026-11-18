@@ -129,7 +129,7 @@ function CatalogLink() {
   )
 }
 
-/** Buton pe cardul unui favorit; `relative z-10` îl ridică deasupra linkului care acoperă cardul. */
+
 function RemoveFavorite({ productId }) {
   const busy = useRef(false)
   const [state, setState] = useState({ pending: false, error: '' })
@@ -140,7 +140,7 @@ function RemoveFavorite({ productId }) {
     setState({ pending: true, error: '' })
     try {
       await sendInteraction(productId, 'unfavorite')
-      notifyUserDataChanged() // istoricul se reîncarcă și cardul dispare
+      notifyUserDataChanged() 
     } catch (error) {
       setState({ pending: false, error: errorMessage(error) })
     } finally {

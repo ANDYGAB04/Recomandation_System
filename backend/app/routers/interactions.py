@@ -40,12 +40,7 @@ def _has_purchased(session: Session, user_id: int, product_id: int) -> bool:
 def record_interaction(
     data: InteractionIn, user: CurrentUserDep, session: SessionDep, response: Response
 ) -> InteractionRecorded:
-    """Salvează o vizualizare, un favorit, o scoatere din favorite sau o cumpărare simulată.
-
-    Retrimiterea aceluiași `event_id` răspunde cu 200 și `recorded: false`, fără să-l salveze din nou.
-    """
     duplicate = InteractionRecorded(event_id=data.event_id, recorded=False)
-    # Verificăm duplicatul primul: o retrimitere trebuie să reușească chiar dacă produsul s-a schimbat între timp.
     if _already_recorded(session, data.event_id):
         response.status_code = status.HTTP_200_OK
         return duplicate
@@ -59,7 +54,6 @@ def record_interaction(
         if _has_purchased(session, user.id, product.id):
             raise HTTPException(status.HTTP_409_CONFLICT, detail=ALREADY_PURCHASED)
 
-    # Evenimentul și lista de favorite se schimbă în aceeași tranzacție.
     session.add(Interaction(event_id=data.event_id, user_id=user.id, product_id=product.id, type=data.type.value))
     favorite = session.get(Favorite, (user.id, product.id))
     if data.type == EventType.FAVORITE and favorite is None:
@@ -68,7 +62,7 @@ def record_interaction(
         session.delete(favorite)
     try:
         session.commit()
-    except IntegrityError:  # același event_id salvat între timp de o cerere paralelă
+    except IntegrityError:  
         session.rollback()
         if not _already_recorded(session, data.event_id):
             raise
@@ -79,7 +73,6 @@ def record_interaction(
 
 @router.get("/me/history")
 def get_history(user: CurrentUserDep, session: SessionDep) -> HistoryOut:
-    """Favoritele, cumpărăturile și ultimele evenimente ale utilizatorului autentificat, cele mai noi primele."""
     favorites = session.exec(
         select(Product)
         .join(Favorite, Favorite.product_id == Product.id)

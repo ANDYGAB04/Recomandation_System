@@ -1,13 +1,3 @@
-"""Date de test pentru evaluarea cu utilizatori: voturi „Ți-a fost utilă?” și răspunsuri la chestionar.
-
-Sunt generate automat, ca paginile și exportul să poată fi încercate înainte de răspunsurile reale.
-Sunt marcate peste tot ca date de test și numărate separat de cele reale:
-
-- voturile vin de la clienții simulați (`client…@simulat.example.com`), pe care rezumatul îi separă;
-- răspunsurile la chestionar au `is_test_data = True`.
-
-Nu sunt părerea unor oameni reali și nu se raportează ca atare.
-"""
 
 from datetime import timedelta
 
@@ -24,7 +14,6 @@ TEST_DATA_SEED = 20261118
 TEST_PARTICIPANTS = 12
 VOTES_PER_PARTICIPANT = 5
 
-# Comentarii generice pentru întrebarea deschisă, marcate ca date de test.
 TEST_COMMENTS = [
     "[date de test] Explicațiile m-au ajutat să înțeleg de ce apare fiecare produs.",
     "[date de test] Mi-ar plăcea mai multe filtre pe pagina de recomandări.",
@@ -36,7 +25,6 @@ TEST_COMMENTS = [
 def seed_feedback_test_data(
     session: Session, participants: int = TEST_PARTICIPANTS, seed: int = TEST_DATA_SEED
 ) -> tuple[int, int]:
-    """Adaugă datele de test dacă nu există deja. Întoarce (răspunsuri la chestionar, voturi) create."""
     if session.exec(select(SurveyResponse).where(SurveyResponse.is_test_data)).first() is not None:
         return 0, 0
     rng = np.random.default_rng(seed)
@@ -54,7 +42,6 @@ def seed_feedback_test_data(
         result = recommend(rec, session.get(UserProfile, user.id), History.from_interactions(events), {},
                            k=VOTES_PER_PARTICIPANT, explain=False)
         for item in result.items:
-            # Cu cât potrivirea e mai mare, cu atât votul „util” e mai probabil.
             useful = bool(rng.random() < 0.45 + 0.5 * min(item.score, 1.0))
             session.add(RecommendationFeedback(user_id=user.id, product_id=item.product_id, useful=useful,
                                                strategy=result.strategy, created_at=SIMULATION_END,

@@ -24,17 +24,16 @@ def _find_by_email(session: Session, email: str) -> User | None:
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(data: RegisterRequest, request: Request, session: SessionDep) -> TokenResponse:
-    """Creează contul și un profil gol, apoi întoarce direct un token."""
     if _find_by_email(session, data.email) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=EMAIL_TAKEN)
 
     user = User(email=data.email, password_hash=hash_password(data.password), display_name=data.display_name)
     session.add(user)
     try:
-        session.flush()  # obține user.id
+        session.flush()  
         session.add(UserProfile(user_id=user.id))
         session.commit()
-    except IntegrityError:  # alt cont cu același e-mail creat între timp
+    except IntegrityError:  
         session.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, detail=EMAIL_TAKEN) from None
     session.refresh(user)
@@ -44,7 +43,6 @@ def register(data: RegisterRequest, request: Request, session: SessionDep) -> To
 @router.post("/login")
 def login(data: LoginRequest, request: Request, session: SessionDep) -> TokenResponse:
     user = _find_by_email(session, data.email)
-    # Verificăm o parolă și când contul nu există, ca răspunsul să dureze la fel.
     password_ok = verify_password(data.password, user.password_hash if user else DUMMY_PASSWORD_HASH)
     if user is None or not password_ok:
         raise HTTPException(
@@ -55,5 +53,4 @@ def login(data: LoginRequest, request: Request, session: SessionDep) -> TokenRes
 
 @router.get("/me")
 def me(user: CurrentUserDep) -> UserMe:
-    """Contul utilizatorului autentificat."""
     return UserMe.model_validate(user, from_attributes=True)

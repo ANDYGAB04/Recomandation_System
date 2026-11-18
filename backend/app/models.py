@@ -1,8 +1,3 @@
-"""Tabelele bazei de date (SQLModel).
-
-Listele (utilizări, stiluri, sezoane…) și activitățile din profil se salvează ca JSON;
-valorile lor sunt cele din app/vocabulary.py și se validează la intrarea în API.
-"""
 
 from datetime import UTC, datetime
 
@@ -27,12 +22,10 @@ class User(SQLModel, table=True):
 
 
 class UserProfile(SQLModel, table=True):
-    """Datele declarate de utilizator în setări. Câmpurile goale înseamnă „necompletat”."""
 
     __tablename__ = "user_profiles"
 
     user_id: int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
-    # {"running": "high", "cycling": "low"}: activitate → intensitate
     activities: dict[str, str] = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
     level: str | None = None
     styles: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
@@ -48,13 +41,11 @@ class Product(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True, max_length=200)
-    # Activitatea principală; `usages` poate conține și alte activități potrivite.
     category: str = Field(index=True)
     usages: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     levels: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     styles: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     seasons: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
-    # Etichete libere, descriptive (de exemplu „cort”, „impermeabil”), folosite la căutare și explicații.
     tags: list[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
     description: str = ""
     price: float
@@ -68,7 +59,6 @@ class Interaction(SQLModel, table=True):
     __tablename__ = "interactions"
 
     id: int | None = Field(default=None, primary_key=True)
-    # Generat de frontend; retrimiterea aceluiași eveniment nu îl dublează.
     event_id: str = Field(unique=True, max_length=64)
     user_id: int = Field(foreign_key="users.id", ondelete="CASCADE")
     product_id: int = Field(foreign_key="products.id")
@@ -86,7 +76,6 @@ class Interaction(SQLModel, table=True):
 
 
 class Favorite(SQLModel, table=True):
-    """Starea curentă a favoritelor; se actualizează în aceeași tranzacție cu evenimentul."""
 
     __tablename__ = "favorites"
 
@@ -96,17 +85,12 @@ class Favorite(SQLModel, table=True):
 
 
 class RecommendationFeedback(SQLModel, table=True):
-    """Răspunsul utilizatorului la „Ți-a fost utilă?” pentru un produs recomandat.
-
-    Un singur vot per utilizator și produs; un vot nou îl înlocuiește pe cel vechi.
-    """
 
     __tablename__ = "recommendation_feedback"
 
     user_id: int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
     product_id: int = Field(foreign_key="products.id", primary_key=True)
     useful: bool
-    # Strategia cu care a fost recomandat produsul: „personalized” (profil) sau „popular” (rezervă).
     strategy: str
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)
@@ -117,23 +101,16 @@ class RecommendationFeedback(SQLModel, table=True):
 
 
 class SurveyResponse(SQLModel, table=True):
-    """Un răspuns la chestionar, anonim: nu are legătură cu contul care l-a trimis."""
 
     __tablename__ = "survey_responses"
 
     id: int | None = Field(default=None, primary_key=True)
-    # {"q1": 4, …, "q6": "text"}; întrebările sunt în app/survey.py
     answers: dict = Field(default_factory=dict, sa_column=Column(JSON, nullable=False))
     created_at: datetime = Field(default_factory=utc_now)
-    # true pentru răspunsurile generate de scriptul de inițializare (date de test), nu de participanți reali
     is_test_data: bool = False
 
 
 class SurveyParticipant(SQLModel, table=True):
-    """Cine a completat deja chestionarul, ca fiecare cont să răspundă o singură dată.
-
-    Separat de răspunsuri, deci răspunsurile rămân anonime.
-    """
 
     __tablename__ = "survey_participants"
 

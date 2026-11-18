@@ -20,7 +20,7 @@ def test_export_has_no_personal_data_and_correct_averages(tmp_path):
     engine.dispose()
 
     assert [row["raspuns"] for row in data] == [1, 2]
-    assert data[0]["data"] == "2026-11-18"  # doar ziua, fără oră
+    assert data[0]["data"] == "2026-11-18"  
     assert averages(data) == {"q1": 3.0, "q2": 4.0, "q3": 3.5, "q4": 3.0, "q5": 4.5}
 
     out = tmp_path / "raspunsuri.csv"

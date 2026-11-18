@@ -32,7 +32,7 @@ export default function Layout() {
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Meniul de pe telefon se închide după navigare.
+  
   useEffect(() => setMenuOpen(false), [location.pathname])
 
   const mainLinks = isAuthenticated

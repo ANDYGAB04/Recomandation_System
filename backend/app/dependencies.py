@@ -1,4 +1,3 @@
-"""Dependențe FastAPI comune tuturor rutelor."""
 
 from collections.abc import Iterator
 from typing import Annotated
@@ -18,7 +17,6 @@ def get_session(request: Request) -> Iterator[Session]:
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
-# auto_error=False: răspundem noi cu 401 (FastAPI ar întoarce 403 când lipsește antetul).
 bearer_scheme = HTTPBearer(auto_error=False, description="Token-ul primit de la /auth/register sau /auth/login")
 
 
@@ -27,7 +25,6 @@ def get_current_user(
     session: SessionDep,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> User:
-    """Utilizatorul autentificat, din antetul `Authorization: Bearer <token>`; altfel 401."""
     unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Trebuie să te autentifici.",
@@ -50,7 +47,6 @@ def get_optional_user(
     session: SessionDep,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> User | None:
-    """Utilizatorul autentificat, dacă cererea are token; None fără token. Un token invalid dă tot 401."""
     if credentials is None:
         return None
     return get_current_user(request, session, credentials)

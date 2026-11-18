@@ -1,4 +1,3 @@
-"""Datele de test pentru evaluarea cu utilizatori: generate de seed, marcate și separate de cele reale."""
 
 import csv
 

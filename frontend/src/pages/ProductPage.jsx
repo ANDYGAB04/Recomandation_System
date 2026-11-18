@@ -21,7 +21,7 @@ export default function ProductPage() {
   const { isAuthenticated } = useAuth()
   const history = useHistory()
 
-  // „Înapoi la catalog” păstrează filtrele cu care s-a ajuns aici.
+  
   const from = location.state?.from
   const backTo = from ? `${from.pathname}${from.search}` : '/catalog'
 
@@ -37,15 +37,15 @@ export default function ProductPage() {
     }
   }, [id, reloadKey])
 
-  // O vizualizare per deschidere a paginii: id-ul evenimentului e legat de navigare (location.key),
-  // deci rularea dublă a efectului (StrictMode) sau o reîncărcare a produsului nu o dublează.
+  
+  
   const viewIds = useRef({})
   const loadedId = state.product?.id
   useEffect(() => {
     if (!isAuthenticated || loadedId === undefined) return
     const openKey = `${location.key}:${loadedId}`
     viewIds.current[openKey] ??= newEventId()
-    sendInteraction(loadedId, 'view', viewIds.current[openKey]).catch(() => {}) // o vizualizare pierdută nu blochează pagina
+    sendInteraction(loadedId, 'view', viewIds.current[openKey]).catch(() => {}) 
   }, [isAuthenticated, loadedId, location.key])
 
   const backLink = (
@@ -132,7 +132,7 @@ export default function ProductPage() {
         </div>
       </section>
 
-      {/* Produsul deschis nu apare în propriile recomandări. */}
+      {}
       <RecommendedStrip exclude={[product.id]} />
     </section>
   )

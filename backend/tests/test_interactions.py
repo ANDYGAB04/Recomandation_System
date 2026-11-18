@@ -92,11 +92,11 @@ def test_favorites_reflect_the_last_action(client, ana, products):
     cort = products["Cort 2P"]
     send(client, ana, cort, "favorite")
     assert count(client, Favorite, product_id=cort) == 1
-    send(client, ana, cort, "favorite")  # încă o dată: tot un singur favorit
+    send(client, ana, cort, "favorite")  
     assert count(client, Favorite, product_id=cort) == 1
     send(client, ana, cort, "unfavorite")
     assert count(client, Favorite, product_id=cort) == 0
-    send(client, ana, cort, "unfavorite")  # scos dintr-o listă în care nu e: nu e o eroare
+    send(client, ana, cort, "unfavorite")  
     assert count(client, Favorite, product_id=cort) == 0
     send(client, ana, cort, "favorite")
     assert count(client, Favorite, product_id=cort) == 1

@@ -19,7 +19,6 @@ def _error(question_id: str, message: str) -> dict:
 
 
 def validate_answers(answers: dict) -> dict:
-    """Răspunsurile curățate; RequestValidationError (422) cu câte o eroare pe întrebare."""
     errors = []
     known = {q.id for q in QUESTIONS}
     errors += [_error(key, "Întrebare necunoscută.") for key in answers if key not in known]
@@ -55,7 +54,6 @@ def _count(session, test_data: bool = False) -> int:
 
 @router.get("")
 def get_survey(session: SessionDep, user: OptionalUserDep) -> SurveyOut:
-    """Întrebările chestionarului și dacă utilizatorul autentificat a răspuns deja."""
     answered = None if user is None else session.get(SurveyParticipant, user.id) is not None
     return SurveyOut(
         questions=[SurveyQuestionOut(id=q.id, text=q.text, kind=q.kind, low=q.low, high=q.high) for q in QUESTIONS],
@@ -67,7 +65,6 @@ def get_survey(session: SessionDep, user: OptionalUserDep) -> SurveyOut:
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def submit_survey(data: SurveyAnswersIn, user: CurrentUserDep, session: SessionDep) -> dict[str, bool]:
-    """Salvează răspunsurile, anonim: contul se notează separat, doar ca să nu răspundă de două ori."""
     answers = validate_answers(data.answers)
     if session.get(SurveyParticipant, user.id) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=ALREADY_ANSWERED)
@@ -75,7 +72,7 @@ def submit_survey(data: SurveyAnswersIn, user: CurrentUserDep, session: SessionD
     session.add(SurveyResponse(answers=answers))
     try:
         session.commit()
-    except IntegrityError:  # două trimiteri simultane din același cont
+    except IntegrityError:  
         session.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, detail=ALREADY_ANSWERED) from None
     return {"saved": True}

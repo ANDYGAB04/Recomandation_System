@@ -1,7 +1,3 @@
-"""Aplicația FastAPI HobbyShop.
-
-    uvicorn app.main:app --reload        # documentația interactivă: http://127.0.0.1:8000/docs
-"""
 
 from contextlib import asynccontextmanager
 
@@ -16,11 +12,10 @@ from .routers import auth, evaluation, health, interactions, products, profile, 
 
 
 def _warm_up_recommender(app: FastAPI) -> None:
-    """Calculează vectorii produselor la pornire, dacă există deja un catalog."""
     with Session(app.state.engine) as session:
         try:
             get_recommender(session, app.state)
-        except HTTPException:  # catalog gol: vectorii se calculează după `python -m app.seed`
+        except HTTPException:  
             pass
 
 

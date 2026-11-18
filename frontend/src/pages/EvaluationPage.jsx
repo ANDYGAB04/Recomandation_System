@@ -12,7 +12,7 @@ const formatPercent = (value) => (value == null ? '–' : percentFormat.format(v
 const formatMs = (value) => (value == null ? '–' : `${value.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} ms`)
 
 function formatPeriod({ start, end }) {
-  // `end` este exclusiv: ultima zi inclusă este cea dinainte.
+  
   const last = new Date(new Date(end).getTime() - 24 * 60 * 60 * 1000)
   return `${dateFormat.format(new Date(start))} – ${dateFormat.format(last)}`
 }
@@ -24,7 +24,7 @@ const METRICS = [
   { key: 'latency_ms', title: 'Timp de răspuns', format: formatMs },
 ]
 
-/** Rezultatele evaluării offline (GET /evaluation): popularitate vs. recomandarea bazată pe profil. */
+
 export default function EvaluationPage() {
   const { status, data, error, reload } = useApiResource('/evaluation')
 
@@ -103,7 +103,7 @@ export default function EvaluationPage() {
   )
 }
 
-/** Părerea utilizatorilor reali (GET /evaluation/feedback): butoanele „Ți-a fost utilă?” de pe recomandări. */
+
 function UserFeedback() {
   const { status, data, error, reload } = useApiResource('/evaluation/feedback')
 
@@ -154,7 +154,7 @@ function UserFeedback() {
   )
 }
 
-/** Voturile generate de seed pentru clienții simulați: afișate separat și marcate, ca să nu fie confundate cu cele reale. */
+
 function TestFeedback({ stats }) {
   return (
     <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50/60 p-4">
@@ -256,7 +256,7 @@ function ResultsTable({ window, k, highlight }) {
   const isHighlighted = (row) => highlight && row.config === highlight
   return (
     <>
-      {/* Desktop: tabel */}
+      {}
       <div className="hidden md:block">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
@@ -287,7 +287,7 @@ function ResultsTable({ window, k, highlight }) {
         </table>
       </div>
 
-      {/* Telefon: câte un card pe configurație */}
+      {}
       <ul className="space-y-3 md:hidden">
         {window.results.map((row) => (
           <li key={row.config} className={`rounded-lg border p-3 ${isHighlighted(row) ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200'}`}>

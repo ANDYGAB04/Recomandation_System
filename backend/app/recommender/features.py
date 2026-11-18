@@ -1,8 +1,3 @@
-"""Traducerea produselor și a profilului declarat în caracteristici comune.
-
-Produsele și profilul folosesc aceleași nume de caracteristici (de exemplu `usage:running`,
-`style:budget`), deci un profil se poate compara direct cu un produs.
-"""
 
 from collections.abc import Iterable, Mapping
 from typing import Protocol
@@ -32,8 +27,6 @@ class DeclaredProfileLike(Protocol):
     max_budget: float | None
 
 
-# Cât contează fiecare grup de preferințe în profil. Activitatea contează cel mai mult:
-# cine alege alergare trebuie să vadă produse de alergare înainte de orice alt criteriu.
 GROUP_WEIGHTS: dict[str, float] = {
     "category": 1.0,
     "usage": 1.0,
@@ -44,14 +37,12 @@ GROUP_WEIGHTS: dict[str, float] = {
 
 INTENSITY_WEIGHTS: dict[str, float] = {Intensity.HIGH: 1.0, Intensity.LOW: 0.5}
 
-# Nivelurile vecine se potrivesc parțial: un începător poate folosi și echipament intermediar.
 LEVEL_AFFINITY: dict[str, dict[str, float]] = {
     Level.BEGINNER: {Level.BEGINNER: 1.0, Level.INTERMEDIATE: 0.5},
     Level.INTERMEDIATE: {Level.BEGINNER: 0.5, Level.INTERMEDIATE: 1.0, Level.ADVANCED: 0.5},
     Level.ADVANCED: {Level.INTERMEDIATE: 0.5, Level.ADVANCED: 1.0},
 }
 
-# Echipamentul „tot anul” se potrivește și vara, și iarna, dar mai slab decât cel dedicat.
 SEASON_AFFINITY: dict[str, dict[str, float]] = {
     Season.SUMMER: {Season.SUMMER: 1.0, Season.ALL_YEAR: 0.5},
     Season.WINTER: {Season.WINTER: 1.0, Season.ALL_YEAR: 0.5},
@@ -69,7 +60,6 @@ def split_feature(name: str) -> tuple[str, str]:
 
 
 def product_preference_features(product: ProductLike) -> dict[str, float]:
-    """Caracteristicile comparabile cu profilul: categorie, utilizări, niveluri, stiluri, sezoane."""
     features = {feature("category", product.category): 1.0}
     groups: Iterable[tuple[str, list[str]]] = (
         ("usage", product.usages),
@@ -83,15 +73,10 @@ def product_preference_features(product: ProductLike) -> dict[str, float]:
 
 
 def product_text(product: ProductLike) -> str:
-    """Textul descriptiv al produsului, pentru TF-IDF: nume, etichete libere, descriere."""
     return " ".join([product.name, *product.tags, product.description])
 
 
 def declared_choices(profile: DeclaredProfileLike) -> set[str]:
-    """Caracteristicile alese explicit în setări, fără potrivirile parțiale (nivel vecin, „tot anul”).
-
-    Explicațiile („pentru că ai ales …”) pomenesc doar aceste caracteristici.
-    """
     choices = {feature(group, a) for a in profile.activities for group in ("category", "usage")}
     choices |= {feature("style", s) for s in profile.styles}
     if profile.level:
@@ -102,7 +87,6 @@ def declared_choices(profile: DeclaredProfileLike) -> set[str]:
 
 
 def declared_profile_features(profile: DeclaredProfileLike) -> dict[str, float]:
-    """Preferințele din setări, ponderate, în spațiul caracteristicilor produselor."""
     features: dict[str, float] = {}
 
     def add(group: str, value: str, weight: float) -> None:

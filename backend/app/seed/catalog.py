@@ -1,14 +1,3 @@
-"""Catalogul demonstrativ HobbyShop: produse de test generate determinist, cu seed fix.
-
-Fiecare tip de produs (de exemplu „Cort 2 persoane”) apare în trei linii:
-
-- **Start**: pentru începători, buget redus, cel mai ieftin;
-- **Activ**: pentru începători și intermediari, confort sau rezistență;
-- **Pro**: pentru avansați, performanță / ultraușor / rezistență, cel mai scump.
-
-Valorile din `usages`, `levels`, `styles`, `seasons` sunt cele din app/vocabulary.py, deci
-produsele se compară direct cu setările de profil. Același seed dă mereu același catalog.
-"""
 
 import random
 from dataclasses import dataclass
@@ -28,11 +17,9 @@ class ProductType:
     base_price: float
     description: str
     tags: tuple[str, ...]
-    # Alte activități potrivite, pe lângă categorie.
     also: tuple[Activity, ...] = ()
     mid_styles: tuple[Style, ...] = (S.COMFORT, S.DURABLE)
     pro_styles: tuple[Style, ...] = (S.PERFORMANCE, S.ULTRALIGHT, S.DURABLE)
-    # Stil fix pentru linia Activ, în locul celui ales aleator din `mid_styles`.
     activ_style: Style | None = None
 
 
@@ -57,7 +44,6 @@ SUMMER = (SZ.SUMMER,)
 WINTER = (SZ.WINTER,)
 
 PRODUCT_TYPES: tuple[ProductType, ...] = (
-    # ---- Drumeție ----
     ProductType("Bocanci de drumeție", A.HIKING, (SZ.SUMMER, SZ.ALL_YEAR), 520, "Bocanci cu talpă aderentă și protecție la gleznă.", ("bocanci", "încălțăminte", "impermeabil")),
     ProductType("Bocanci de iarnă", A.HIKING, WINTER, 780, "Bocanci izolați, compatibili cu colțari, pentru zăpadă și gheață.", ("bocanci", "încălțăminte", "izolat"), pro_styles=(S.DURABLE,)),
     ProductType("Rucsac de zi 25L", A.HIKING, ALL_YEAR, 260, "Rucsac pentru ture de o zi, cu spate ventilat.", ("rucsac", "25 litri")),
@@ -69,7 +55,6 @@ PRODUCT_TYPES: tuple[ProductType, ...] = (
     ProductType("Strat de bază termic", A.HIKING, WINTER, 230, "Bluză din lână merinos, care păstrează căldura și când e umedă.", ("bluză", "merinos", "termic"), also=(A.CAMPING, A.RUNNING)),
     ProductType("Colțari de drumeție", A.HIKING, WINTER, 340, "Colțari ușori, pentru poteci înghețate.", ("colțari", "gheață"), pro_styles=(S.DURABLE,)),
     ProductType("Lanternă frontală", A.HIKING, ALL_YEAR, 150, "Lanternă frontală LED, cu acumulator.", ("lanternă", "LED"), also=(A.CAMPING, A.RUNNING)),
-    # ---- Camping ----
     ProductType("Cort 2 persoane", A.CAMPING, SUMMER, 760, "Cort de vară pentru două persoane, montaj rapid.", ("cort", "2 persoane"), also=(A.HIKING,)),
     ProductType("Cort 4 anotimpuri", A.CAMPING, WINTER, 1650, "Cort de expediție, rezistent la vânt și zăpadă.", ("cort", "expediție", "4 anotimpuri"), also=(A.HIKING,), pro_styles=(S.DURABLE,)),
     ProductType("Cort de familie 4 persoane", A.CAMPING, SUMMER, 1100, "Cort spațios cu două dormitoare și vestibul.", ("cort", "4 persoane", "familie"), mid_styles=(S.COMFORT,), pro_styles=(S.COMFORT, S.DURABLE)),
@@ -81,7 +66,6 @@ PRODUCT_TYPES: tuple[ProductType, ...] = (
     ProductType("Scaun pliabil", A.CAMPING, SUMMER, 140, "Scaun de camping pliabil, cu husă de transport.", ("scaun", "pliabil"), mid_styles=(S.COMFORT,)),
     ProductType("Filtru de apă", A.CAMPING, ALL_YEAR, 160, "Filtru portabil pentru apă din izvoare și râuri.", ("apă", "filtru"), also=(A.HIKING,)),
     ProductType("Lampă de cort", A.CAMPING, ALL_YEAR, 95, "Lampă LED cu lumină caldă, agățabilă în cort.", ("lampă", "LED")),
-    # ---- Alergare ----
     ProductType("Pantofi de alergare pe șosea", A.RUNNING, (SZ.SUMMER, SZ.ALL_YEAR), 450, "Pantofi cu amortizare pentru asfalt.", ("pantofi", "încălțăminte", "amortizare"), pro_styles=(S.PERFORMANCE,)),
     ProductType("Pantofi de alergare trail", A.RUNNING, ALL_YEAR, 560, "Pantofi cu crampoane pentru poteci și teren accidentat.", ("pantofi", "încălțăminte", "trail"), also=(A.HIKING,)),
     ProductType("Tricou tehnic de alergare", A.RUNNING, SUMMER, 120, "Tricou respirabil, care elimină transpirația.", ("tricou", "respirabil")),
@@ -93,7 +77,6 @@ PRODUCT_TYPES: tuple[ProductType, ...] = (
     ProductType("Centură de alergare", A.RUNNING, SUMMER, 75, "Centură elastică pentru telefon și chei.", ("centură", "telefon")),
     ProductType("Șapcă de alergare", A.RUNNING, SUMMER, 85, "Șapcă ușoară, cu protecție UV.", ("șapcă", "UV")),
     ProductType("Mănuși de alergare", A.RUNNING, WINTER, 90, "Mănuși subțiri, compatibile cu ecranul tactil.", ("mănuși", "termic")),
-    # ---- Ciclism ----
     ProductType("Cască de bicicletă", A.CYCLING, ALL_YEAR, 330, "Cască ventilată, cu sistem de reglaj.", ("cască", "siguranță"), pro_styles=(S.PERFORMANCE, S.ULTRALIGHT), activ_style=S.ULTRALIGHT),
     ProductType("Mănuși de ciclism", A.CYCLING, SUMMER, 110, "Mănuși cu degete scurte și palme căptușite.", ("mănuși",)),
     ProductType("Pantaloni scurți cu bazon", A.CYCLING, SUMMER, 260, "Pantaloni scurți cu bazon pentru ture lungi.", ("pantaloni", "bazon"), activ_style=S.ULTRALIGHT),
@@ -109,7 +92,6 @@ PRODUCT_TYPES: tuple[ProductType, ...] = (
 
 
 def _price(rng: random.Random, value: float) -> float:
-    # Prețuri „de raft”: rotunjite la leu, terminate în ,99.
     return max(round(value * rng.uniform(0.9, 1.1)), 10) - 0.01
 
 
@@ -118,7 +100,6 @@ def _season_text(seasons: tuple[Season, ...]) -> str:
 
 
 def build_catalog(seed: int = CATALOG_SEED) -> list[dict]:
-    """Lista produselor de test, mereu aceeași pentru același seed."""
     rng = random.Random(seed)
     products: list[dict] = []
     for ptype in PRODUCT_TYPES:
@@ -127,7 +108,6 @@ def build_catalog(seed: int = CATALOG_SEED) -> list[dict]:
             if line.name == "Start":
                 styles = [S.BUDGET] + ([S.COMFORT] if rng.random() < 0.4 else [])
             elif line.name == "Activ":
-                # Alegerea aleatoare se face oricum, ca restul catalogului (prețuri, stoc) să rămână același.
                 chosen = rng.choice(ptype.mid_styles)
                 styles = [ptype.activ_style or chosen]
             else:

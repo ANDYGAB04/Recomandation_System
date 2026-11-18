@@ -1,13 +1,3 @@
-"""Recomandare bazată pe conținut: vectorii produselor și scorul față de profilul declarat.
-
-    vector(produs)       = normalizează([ preferințe × W_PREFERINȚE , text × W_TEXT ])
-    profil_declarat(u)   = normalizează(preferințele din setări, ponderate)
-    scor(u, produs)      = cosinus(profil_declarat(u), vector(produs))
-
-Ambele blocuri ale vectorului de produs sunt normalizate separat. Profilul declarat are doar
-partea de preferințe, așa că blocul de text nu schimbă ordinea produselor pentru el. Textul
-(nume, etichete, descriere) contează la produsele similare și la profilul din comportament.
-"""
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
@@ -42,7 +32,6 @@ class ScoredProduct:
 
 
 class ContentRecommender:
-    """Vectorii produselor din catalog; se construiesc o dată, la pornirea API-ului."""
 
     def __init__(self, products: Iterable[ProductLike]):
         self.products: list[ProductLike] = list(products)
@@ -68,7 +57,6 @@ class ContentRecommender:
         ]
 
     def declared_profile(self, profile: DeclaredProfileLike) -> np.ndarray | None:
-        """Vectorul normalizat al preferințelor din setări; None dacă profilul nu are nicio preferință cunoscută."""
         features = declared_profile_features(profile)
         if not features:
             return None
@@ -78,7 +66,6 @@ class ContentRecommender:
         return vector / norm if norm > 0 else None
 
     def behavior_profile(self, weights: Mapping[int, float]) -> np.ndarray | None:
-        """Suma ponderată a vectorilor produselor din istoric, normalizată; None fără istoric."""
         rows = [(self.row[pid], w) for pid, w in weights.items() if pid in self.row and w > 0]
         if not rows:
             return None
@@ -91,11 +78,9 @@ class ContentRecommender:
         return self.matrix[self.row[product_id]].toarray().ravel()
 
     def similarity(self, product_a: int, product_b: int) -> float:
-        """Similaritatea cosinus dintre două produse."""
         return float(self.matrix[self.row[product_a]].multiply(self.matrix[self.row[product_b]]).sum())
 
     def scores(self, profile_vector: np.ndarray) -> np.ndarray:
-        """Similaritatea cosinus dintre profil și fiecare produs (vectorii sunt deja normalizați)."""
         return np.asarray(self.matrix @ profile_vector).ravel()
 
     def rank(
@@ -105,7 +90,6 @@ class ContentRecommender:
         exclude: Iterable[int] = (),
         max_price: float | None = None,
     ) -> list[ScoredProduct]:
-        """Primele k produse cu scor pozitiv, disponibile, sub buget și neexcluse."""
         excluded = set(exclude)
         ranked = [
             ScoredProduct(p.id, float(score))
@@ -121,7 +105,6 @@ class ContentRecommender:
     def recommend_declared(
         self, profile: DeclaredProfileLike, k: int = 10, exclude: Sequence[int] = ()
     ) -> list[ScoredProduct]:
-        """Recomandări doar din datele declarate; listă goală dacă profilul nu are preferințe."""
         vector = self.declared_profile(profile)
         if vector is None:
             return []

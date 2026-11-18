@@ -27,7 +27,6 @@ def ids(result):
     return [item.product_id for item in result.items]
 
 
-# ---- Istoricul ----
 
 def test_history_caps_views_and_follows_the_last_favorite_action():
     history = History.from_events(
@@ -44,12 +43,10 @@ def test_history_can_be_built_from_interaction_models():
     assert History.from_interactions(interactions).product_weights() == {1: 6.0, 2: 10.0}
 
 
-# ---- Criteriile de acceptare ----
 
 def test_a_new_favorite_changes_the_order(rec):
     runner = Profile({"running": "high"}, level="beginner")
     before = ids(recommend(rec, runner, History(), {}, k=6))
-    # Pantofii Pro (3) și ceasul GPS (5) au stilul „performanță”; favoritul îi ridică pe amândoi.
     after = ids(recommend(rec, runner, History.from_events([(3, "favorite")]), {}, k=6))
     assert before != after
     assert after.index(3) < before.index(3) and after.index(5) < before.index(5)
@@ -82,12 +79,11 @@ def test_explanations_only_mention_choices_found_in_both_profile_and_product(rec
             assert match.label.lower() in item.explanation.text.lower()
 
 
-# ---- Rezerva pe popularitate ----
 
 def test_no_settings_and_no_history_falls_back_to_popular(rec):
     result = recommend(rec, None, History(), {6: 3, 1: 5, 12: 9}, k=3)
     assert (result.strategy, result.fallback_reason) == (POPULAR, NO_PROFILE_REASON)
-    assert ids(result) == [1, 6, 2]  # 12 este indisponibil; restul, după id
+    assert ids(result) == [1, 6, 2]  
     assert result.items[0].explanation.text == "Printre cele mai cumpărate: 5 clienți."
 
 
@@ -117,7 +113,6 @@ def test_popular_text_uses_correct_romanian_plural(count, text):
     assert _popular_text(count) == text
 
 
-# ---- Profilul din comportament ----
 
 def test_history_alone_gives_personalized_recommendations(rec):
     result = recommend(rec, None, History.from_events([(6, "purchase")]), {}, k=3)
@@ -151,7 +146,6 @@ def test_viewing_many_times_counts_as_much_as_three_views(rec):
     assert np.allclose(many, reference) and not np.allclose(three, reference)
 
 
-# ---- Produse similare ----
 
 def test_similar_products_exclude_the_product_and_unavailable_ones(rec):
     items = similar(rec, 1, k=10)

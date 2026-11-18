@@ -42,7 +42,7 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await register({ email: form.email.trim(), password: form.password, display_name: form.display_name.trim() })
-      // Contul nou are profilul gol: îl trimitem direct la setări.
+      
       navigate('/setari', { replace: true, state: { newAccount: true } })
     } catch (error) {
       const apiErrors = fieldErrors(error)

@@ -9,7 +9,7 @@ import { useVocabulary } from '../lib/vocabulary.js'
 const PAGE_SIZE = 24
 const SEARCH_DELAY_MS = 300
 
-/** Filtrele stau în adresa paginii (?categorie=…&q=…), ca să se păstreze la „Înapoi” și la reîncărcare. */
+
 function readFilters(params) {
   const page = Number.parseInt(params.get('pagina') ?? '1', 10)
   return {
@@ -45,7 +45,6 @@ export default function CatalogPage() {
   const filters = readFilters(searchParams)
   const { options } = useVocabulary()
 
-  // Textul căutării se actualizează imediat în câmp, dar în adresă (și la API) după o mică pauză.
   const [searchText, setSearchText] = useState(filters.q)
   const [priceText, setPriceText] = useState(filters.maxPrice)
   const [state, setState] = useState({ status: 'loading', data: null, error: null })
@@ -53,18 +52,14 @@ export default function CatalogPage() {
 
   const setFilters = useCallback(
     (changes) => {
-      // Orice schimbare de filtru (în afară de pagină) revine la prima pagină.
       const next = { ...readFilters(searchParams), page: 1, ...changes }
       setSearchParams(writeFilters(next), { replace: !('page' in changes) })
     },
     [searchParams, setSearchParams],
   )
 
-  // Ultimele valori scrise de noi în adresă: nu le copiem înapoi în câmpuri, ca să nu pierdem
-  // caracterele tastate între timp.
   const pushed = useRef({ q: filters.q, maxPrice: filters.maxPrice })
 
-  // Câmpurile urmăresc adresa când se schimbă din afară (de exemplu, butonul „Înapoi”).
   useEffect(() => {
     if (filters.q !== pushed.current.q) setSearchText(filters.q)
     pushed.current.q = filters.q
@@ -132,14 +127,12 @@ export default function CatalogPage() {
         )}
       </div>
 
-      {/* Recomandările apar doar pe prima pagină a catalogului, fără filtre. */}
       {!hasFilters && filters.page === 1 && (
         <div className="mt-6">
           <RecommendedStrip />
         </div>
       )}
 
-      {/* Filtre */}
       <div className="mt-6 space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Categorie">
           {[{ value: '', label: 'Toate' }, ...options('activities')].map((option) => {
@@ -202,7 +195,6 @@ export default function CatalogPage() {
         )}
       </div>
 
-      {/* Rezultate */}
       <div className="mt-6">
         {state.status === 'error' ? (
           <ErrorState message={errorMessage(state.error)} onRetry={() => setReloadKey((key) => key + 1)} />

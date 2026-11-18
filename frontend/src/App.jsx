@@ -19,18 +19,18 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Navigate to="/catalog" replace />} />
 
-        {/* Publice */}
+        {}
         <Route path="catalog" element={<CatalogPage />} />
         <Route path="produs/:id" element={<ProductPage />} />
         <Route path="evaluare" element={<EvaluationPage />} />
 
-        {/* Doar pentru cine nu e autentificat */}
+        {}
         <Route element={<GuestOnly />}>
           <Route path="autentificare" element={<AuthPage />} />
           <Route path="inregistrare" element={<RegisterPage />} />
         </Route>
 
-        {/* Protejate: cer autentificare */}
+        {}
         <Route element={<RequireAuth />}>
           <Route path="setari" element={<SettingsPage />} />
           <Route path="recomandari" element={<RecommendationsPage />} />

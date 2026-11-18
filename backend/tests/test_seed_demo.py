@@ -30,7 +30,6 @@ def engine(settings):
 
 
 def dump(engine):
-    """Datele care trebuie să fie identice la fiecare rulare (hash-urile parolelor au sare aleatoare)."""
     with Session(engine) as s:
         return (
             [(u.id, u.email, u.display_name, u.created_at) for u in s.exec(select(User).order_by(User.id))],

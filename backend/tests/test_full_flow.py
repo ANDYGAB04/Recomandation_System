@@ -1,8 +1,3 @@
-"""Testarea fluxului complet prin API, ca la laborator (pasul 22, CRI-25).
-
-Fiecare test urmează un scenariu din docs/testare.md, pe baza de date completă:
-catalogul, conturile demo Maria și Radu și clienții simulați.
-"""
 
 import uuid
 
@@ -16,7 +11,7 @@ from app.main import create_app
 from app.seed import seed_all
 from tests.helpers import auth_header
 
-UI_PAGE_SIZE = 12  # câte recomandări cere pagina „Recomandate pentru tine”
+UI_PAGE_SIZE = 12  
 
 CYCLIST = {"activities": {"cycling": "high"}, "level": "intermediate", "styles": ["ultralight"], "max_budget": 500}
 
@@ -62,13 +57,11 @@ def act(client, headers, product_id, type_):
     )
 
 
-# ---------- Scenariul 1: cont nou de la zero ----------
 
 
 def test_new_account_settings_then_recommendations(api):
     email, headers = new_account(api)
 
-    # Contul nou are profilul gol: frontendul îl trimite la setări.
     assert api.get("/profile", headers=headers).json()["is_complete"] is False
 
     saved = api.put("/profile", headers=headers, json=CYCLIST)
@@ -84,15 +77,12 @@ def test_new_account_settings_then_recommendations(api):
         assert product["available"]
         assert item["explanation"]["text"]
         assert any(m["value"] == "cycling" for m in item["explanation"]["matched"])
-    # Produsele ultraușoare sunt primele.
     assert "ultralight" in recs["items"][0]["product"]["styles"]
 
-    # Setările rămân după o nouă autentificare.
     again = login(api, email, "parola-noua")
     assert {k: v for k, v in api.get("/profile", headers=again).json().items() if k in CYCLIST} == CYCLIST
 
 
-# ---------- Scenariul 2: schimbarea setărilor ----------
 
 
 def test_changing_settings_changes_the_list(api):
@@ -107,7 +97,6 @@ def test_changing_settings_changes_the_list(api):
     assert all("running" in i["product"]["usages"] and i["product"]["price"] <= 200 for i in running["items"])
 
 
-# ---------- Scenariul 3: comportament ----------
 
 
 def test_views_and_a_favorite_adapt_the_list_and_purchases_disappear(api):
@@ -122,7 +111,7 @@ def test_views_and_a_favorite_adapt_the_list_and_purchases_disappear(api):
 
     after = recommend(api, headers)
     assert ids(after) != ids(before)
-    assert ids(after).index(target) < 5  # produsul favorit urcă în listă
+    assert ids(after).index(target) < 5  
     assert any(item["explanation"]["because_of"] for item in after["items"])
 
     bought = after["items"][0]["product"]["id"]
@@ -132,7 +121,6 @@ def test_views_and_a_favorite_adapt_the_list_and_purchases_disappear(api):
     assert bought not in [item["product"]["id"] for item in similar]
 
 
-# ---------- Scenariul 4: cele două conturi demo ----------
 
 
 def test_demo_accounts_have_no_common_recommendation(api):
@@ -147,7 +135,6 @@ def test_demo_accounts_have_no_common_recommendation(api):
     assert all(i["product"]["price"] <= 300 for i in maria_recs["items"])
 
 
-# ---------- Scenariul 5: cazuri limită ----------
 
 
 def test_account_without_settings_or_history_gets_the_marked_fallback(api):

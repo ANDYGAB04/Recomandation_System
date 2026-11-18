@@ -7,7 +7,7 @@ const STATES = {
   error: { dot: 'bg-red-500', text: 'API indisponibil' },
 }
 
-/** Indicator în bara de navigare: arată dacă backendul răspunde la GET /health. */
+
 export default function ApiStatus() {
   const [status, setStatus] = useState('checking')
 

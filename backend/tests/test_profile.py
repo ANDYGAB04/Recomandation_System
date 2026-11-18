@@ -65,7 +65,6 @@ def test_profile_without_activities_is_incomplete(client):
 def test_unknown_or_invalid_values_are_422(client, change):
     headers = register_headers(client)
     assert client.put("/profile", json={**FULL, **change}, headers=headers).status_code == 422
-    # Profilul nu s-a schimbat.
     assert client.get("/profile", headers=headers).json()["activities"] == {}
 
 

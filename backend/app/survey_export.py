@@ -1,11 +1,3 @@
-"""Exportul răspunsurilor la chestionar în CSV, fără date personale (pasul 29).
-
-    python -m app.survey_export                      # din backend/: scrie docs/chestionar-raspunsuri.csv
-    python -m app.survey_export --out raspunsuri.csv
-
-O linie pe răspuns: numărul răspunsului, ziua (fără oră) și răspunsurile la întrebări.
-Afișează și media fiecărei întrebări pe scală.
-"""
 
 import argparse
 import csv
@@ -19,7 +11,6 @@ from .models import SurveyResponse
 from .survey import QUESTIONS, SCALE_IDS
 
 DEFAULT_OUT = BACKEND_DIR.parent / "docs" / "chestionar-raspunsuri.csv"
-# `sursa`: „real” (participant) sau „date de test” (generat de python -m app.seed).
 COLUMNS = ["raspuns", "sursa", "data", *(q.id for q in QUESTIONS)]
 REAL, TEST = "real", "date de test"
 
@@ -30,7 +21,6 @@ def rows(session: Session) -> list[dict]:
         {
             "raspuns": number,
             "sursa": TEST if response.is_test_data else REAL,
-            # Doar ziua: ora exactă ar putea ajuta la identificarea participanților.
             "data": response.created_at.date().isoformat(),
             **{q.id: response.answers.get(q.id, "") for q in QUESTIONS},
         }
@@ -40,7 +30,6 @@ def rows(session: Session) -> list[dict]:
 
 def write_csv(data: list[dict], out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
-    # utf-8-sig: Excel deschide corect diacriticele.
     with out.open("w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=COLUMNS)
         writer.writeheader()

@@ -25,13 +25,13 @@ PRODUCTS = [product(1, "camping"), product(2, "camping"), product(3, "running"),
             product(5, "camping", available=False)]
 
 EVENTS = [
-    (10, 1, "purchase", T0),   # 10: camping în trecut
-    (10, 2, "purchase", CUT),  # relevant (camping)
-    (10, 5, "purchase", CUT),  # indisponibil acum: nu e relevant
+    (10, 1, "purchase", T0),   
+    (10, 2, "purchase", CUT),  
+    (10, 5, "purchase", CUT),  
     (11, 3, "purchase", T0),
-    (11, 3, "purchase", CUT),  # cumpărat și înainte: nu e relevant
-    (12, 4, "purchase", CUT),  # 12: fără istoric înainte de prag
-    (13, 4, "purchase", END),  # după interval: ignorat
+    (11, 3, "purchase", CUT),  
+    (12, 4, "purchase", CUT),  
+    (13, 4, "purchase", END),  
 ]
 
 
@@ -48,15 +48,11 @@ def test_metrics_on_a_small_example_computed_by_hand():
     window = build_window(PRODUCTS, EVENTS, CUT, END)
     rec = ContentRecommender(PRODUCTS)
     behavior = evaluate_config(window, rec, {}, Config("comportament", "personalized", alpha=0.0), k=2)
-    # Utilizatorul 10 are istoric de camping: produsul 2 e singurul camping disponibil necumpărat → găsit.
-    # P@2 = 1 găsit / 2 recomandate = 0,5; R@2 = 1 / 1 relevant = 1.
     assert (behavior["users"], behavior["users_without_history"]) == (1, 1)
     assert (behavior["precision_at_k"], behavior["recall_at_k"]) == (0.5, 1.0)
 
     popular = evaluate_config(window, rec, {}, POPULARITY, k=2)
-    # Popularitatea din trecut recomandă 3 (cumpărat o dată), apoi 2 (după id): pentru 10, produsul 2 e găsit.
     assert (popular["precision_at_k"], popular["recall_at_k"]) == (0.5, 1.0)
-    # Utilizatorul 12 (fără istoric) primește 1 și 3 (câte un cumpărător fiecare); produsul 4 nu e printre ele.
     assert popular["without_history"] == {"precision_at_k": 0.0, "recall_at_k": 0.0}
 
 
@@ -88,7 +84,6 @@ def test_report_states_the_data_is_synthetic_and_profile_beats_popularity(seeded
         report = load_and_run(session)
     assert "sintetice" in report["note"]
     test = {row["strategy"]: row for row in report["test"]["results"]}
-    # Concluzia principală a evaluării, pe datele generate cu seed-ul implicit.
     assert test["personalized"]["recall_at_k"] > test["popular"]["recall_at_k"]
     assert test["personalized"]["coverage"] > test["popular"]["coverage"]
     assert report["selected_config"] in {row["config"] for row in report["validation"]["results"]}
@@ -106,7 +101,7 @@ def test_evaluation_endpoint(settings):
         data = first.json()
         assert data["k"] == 5 and set(data) == {"k", "note", "selected_config", "validation", "test"}
         assert data["test"]["results"][0]["config"] == "popularitate"
-        assert client.get("/evaluation").json() == data  # din memorie
+        assert client.get("/evaluation").json() == data  
 
 
 def test_evaluation_without_data_gives_a_clear_error(client):

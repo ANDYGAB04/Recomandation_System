@@ -5,11 +5,7 @@ import { AvailabilityBadge } from './Status.jsx'
 
 const MAX_TAGS = 3
 
-/**
- * Cardul unui produs în grilă; tot cardul e clicabil.
- * `children` apare sub preț (de exemplu, explicația unei recomandări); elementele interactive
- * din `children` au nevoie de `relative z-10`, ca să fie deasupra linkului.
- */
+
 export default function ProductCard({ product, children }) {
   const { label } = useVocabulary()
   const location = useLocation()
@@ -29,7 +25,7 @@ export default function ProductCard({ product, children }) {
       </div>
 
       <h2 className="mt-3 text-base font-semibold leading-snug text-gray-900">
-        {/* Linkul acoperă tot cardul; păstrăm filtrele catalogului pentru butonul „Înapoi”. */}
+        {}
         <Link
           to={`/produs/${product.id}`}
           state={{ from: location }}

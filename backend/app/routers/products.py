@@ -15,7 +15,6 @@ PRODUCT_NOT_FOUND = "Produsul nu există."
 
 
 def normalize(text: str) -> str:
-    """Litere mici, fără diacritice: „Ușor” și „usor” se potrivesc."""
     decomposed = unicodedata.normalize("NFKD", text.casefold())
     return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
 
@@ -35,7 +34,6 @@ def list_products(
     limit: Annotated[int, Query(ge=1, le=100)] = 24,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> ProductPage:
-    """Catalogul, ordonat după id. Filtrele se pot combina."""
     query = select(Product).order_by(Product.id)
     if category is not None:
         query = query.where(Product.category == category.value)
@@ -45,8 +43,6 @@ def list_products(
         query = query.where(Product.available)
     products = list(session.exec(query))
 
-    # Căutarea text se face în Python: SQLite nu ignoră diacriticele, iar etichetele sunt JSON.
-    # Catalogul are ~130 de produse, deci costul e neglijabil.
     terms = normalize(q).split() if q else []
     if terms:
         products = [p for p in products if matches(p, terms)]

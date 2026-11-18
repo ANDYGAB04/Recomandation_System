@@ -1,10 +1,3 @@
-"""Valorile permise pentru profil, produse și interacțiuni.
-
-Este singura sursă a acestor valori: backendul le validează, motorul de recomandare le
-folosește drept caracteristici, iar frontendul le citește din GET /vocabulary, împreună
-cu etichetele în română. Valorile sunt identificatori ASCII stabili; ce vede utilizatorul
-sunt etichetele.
-"""
 
 from enum import StrEnum
 
@@ -68,7 +61,6 @@ LABELS: dict[type[StrEnum], dict[str, str]] = {
     },
 }
 
-# Cheile din răspunsul GET /vocabulary.
 VOCABULARY_KEYS: dict[str, type[StrEnum]] = {
     "activities": Activity,
     "intensities": Intensity,

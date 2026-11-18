@@ -53,7 +53,6 @@ def get_recommendations(
     k: Annotated[int, Query(ge=1, le=50, description="Câte recomandări")] = 10,
     exclude: Annotated[list[int] | None, Query(description="Produse de exclus, de exemplu cel deschis în pagină")] = None,
 ) -> RecommendationsOut:
-    """Recomandările personalizate, cu explicații; fără setări și fără istoric, cele mai cumpărate produse."""
     rec = get_recommender(session, request.app.state)
     result = recommend(
         rec,
@@ -72,7 +71,6 @@ def get_recommendations(
 
 @router.get("/recommendations/profile")
 def get_recommendation_profile(request: Request, session: SessionDep, user: CurrentUserDep) -> RecommendationProfileOut:
-    """Pe ce date se bazează recomandările: ponderea surselor, interesele dominante, produsele din istoric."""
     rec = get_recommender(session, request.app.state)
     summary = profile_summary(rec, load_profile(session, user.id), load_history(session, user.id))
     return RecommendationProfileOut(
@@ -98,7 +96,6 @@ def get_similar_products(
     user: OptionalUserDep,
     k: Annotated[int, Query(ge=1, le=20, description="Câte produse similare")] = 4,
 ) -> SimilarOut:
-    """Produsele cele mai asemănătoare. Cu token, fără cele cumpărate deja de utilizator."""
     rec = get_recommender(session, request.app.state)
     if product_id not in rec.by_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=PRODUCT_NOT_FOUND)
@@ -114,7 +111,6 @@ def _feedback_out(feedback: RecommendationFeedback) -> FeedbackOut:
 
 @router.post("/recommendations/feedback")
 def save_feedback(data: FeedbackIn, session: SessionDep, user: CurrentUserDep) -> FeedbackOut:
-    """Răspunsul la „Ți-a fost utilă?” pentru un produs recomandat; un vot nou îl înlocuiește pe cel vechi."""
     if session.get(Product, data.product_id) is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=PRODUCT_NOT_FOUND)
     feedback = session.get(RecommendationFeedback, (user.id, data.product_id))
@@ -130,6 +126,5 @@ def save_feedback(data: FeedbackIn, session: SessionDep, user: CurrentUserDep) -
 
 @router.get("/recommendations/feedback")
 def list_feedback(session: SessionDep, user: CurrentUserDep) -> list[FeedbackOut]:
-    """Voturile utilizatorului curent, ca interfața să arate butonul ales."""
     query = select(RecommendationFeedback).where(RecommendationFeedback.user_id == user.id)
     return [_feedback_out(f) for f in session.exec(query.order_by(RecommendationFeedback.product_id))]

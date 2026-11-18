@@ -1,11 +1,8 @@
-/**
- * Modulul comun pentru apelurile către API-ul FastAPI.
- * Adresa vine din VITE_API_URL (vezi .env.example); implicit, serverul local de dezvoltare.
- */
+
 
 export const API_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
 
-// Token-ul utilizatorului autentificat, trimis automat la fiecare cerere (setat de AuthProvider).
+
 let authToken = null
 let onUnauthorized = null
 
@@ -13,7 +10,7 @@ export function setAuthToken(token) {
   authToken = token || null
 }
 
-/** Funcția apelată când API-ul răspunde 401 la o cerere trimisă cu token (token expirat sau invalid). */
+
 export function setUnauthorizedHandler(handler) {
   onUnauthorized = handler
 }
@@ -27,16 +24,7 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Face o cerere către API și întoarce corpul răspunsului (JSON sau text; null pentru 204).
- * Aruncă ApiError pentru răspunsuri cu cod de eroare sau când API-ul nu răspunde (status 0).
- *
- * @param {string} path               calea, de exemplu "/health"
- * @param {object} [options]
- * @param {string} [options.method]   implicit "GET"
- * @param {any}    [options.body]     se trimite ca JSON
- * @param {string} [options.token]    token de autentificare (Bearer); implicit, cel al utilizatorului autentificat
- */
+
 export async function apiRequest(path, { method = 'GET', body, token = authToken, headers = {}, ...rest } = {}) {
   const finalHeaders = { Accept: 'application/json', ...headers }
   if (body !== undefined) finalHeaders['Content-Type'] = 'application/json'
@@ -74,13 +62,10 @@ export const api = {
   delete: (path, options) => apiRequest(path, { ...options, method: 'DELETE' }),
 }
 
-/** GET /health — verifică faptul că API-ul și baza de date răspund. */
+
 export const getHealth = () => api.get('/health')
 
-/**
- * Erorile de validare (422) pe câmpuri: { email: "…", password: "…" }.
- * FastAPI trimite în `detail` o listă cu `loc` (de exemplu ["body", "email"]) și `msg`.
- */
+
 export function fieldErrors(error) {
   if (!(error instanceof ApiError) || error.status !== 422 || !Array.isArray(error.data?.detail)) return {}
   const errors = {}
@@ -108,7 +93,7 @@ function translateValidation(item) {
   }
 }
 
-/** Un mesaj de eroare lizibil, de afișat utilizatorului. */
+
 export function errorMessage(error) {
   if (error instanceof ApiError) {
     if (error.status === 0) return 'Serverul nu răspunde. Verifică dacă backendul rulează.'

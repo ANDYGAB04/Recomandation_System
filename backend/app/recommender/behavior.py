@@ -1,7 +1,3 @@
-"""Istoricul unui utilizator, transformat în ponderi pe produse pentru profilul din comportament.
-
-    profil_comportament(u) = normalizează(Σ pondere(produs) × vector(produs))
-"""
 
 from collections import Counter
 from collections.abc import Iterable, Mapping
@@ -10,9 +6,7 @@ from typing import Protocol
 
 from ..vocabulary import EventType
 
-# Ponderile din curs: ipoteze inițiale, verificate la evaluare (pasul 20).
 EVENT_WEIGHTS: Mapping[str, float] = {EventType.VIEW: 1.0, EventType.FAVORITE: 5.0, EventType.PURCHASE: 10.0}
-# Vizualizările repetate ale aceluiași produs contează de cel mult atâtea ori, ca refresh-urile să nu domine.
 VIEW_CAP = 3
 
 
@@ -29,7 +23,6 @@ class History:
 
     @classmethod
     def from_events(cls, events: Iterable[tuple[int, str]]) -> "History":
-        """Evenimentele (produs, tip), în ordine cronologică; favoritele urmează ultima acțiune."""
         history = cls()
         for product_id, event_type in events:
             if event_type == EventType.VIEW:
@@ -44,7 +37,6 @@ class History:
 
     @classmethod
     def from_interactions(cls, interactions: Iterable[InteractionLike]) -> "History":
-        """Din modelele `Interaction`, deja ordonate după moment."""
         return cls.from_events((i.product_id, i.type) for i in interactions)
 
     @property
@@ -69,7 +61,6 @@ class History:
     def weights_by_event(
         self, event_weights: Mapping[str, float] = EVENT_WEIGHTS, view_cap: int = VIEW_CAP
     ) -> dict[str, float]:
-        """Cât contribuie fiecare tip de acțiune la profilul din comportament (aceleași ponderi ca mai sus)."""
         return {
             EventType.PURCHASE.value: event_weights[EventType.PURCHASE] * sum(self.purchases.values()),
             EventType.FAVORITE.value: event_weights[EventType.FAVORITE] * len(self.favorites),
@@ -77,7 +68,6 @@ class History:
         }
 
     def strongest_event(self, product_id: int) -> str | None:
-        """Cea mai puternică interacțiune cu produsul, pentru explicații."""
         if product_id in self.purchases:
             return EventType.PURCHASE
         if product_id in self.favorites:

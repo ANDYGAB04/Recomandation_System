@@ -1,4 +1,4 @@
-/** Conținut temporar pentru paginile care se implementează în pașii următori. */
+
 export default function PagePlaceholder({ title, step, children }) {
   return (
     <section>

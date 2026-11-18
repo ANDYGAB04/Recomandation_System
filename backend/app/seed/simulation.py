@@ -1,12 +1,3 @@
-"""Clienți simulați: setări de profil și istoric pe 90 de zile, generate cu seed fix.
-
-Servesc pentru popularitate (rezerva motorului) și pentru evaluarea offline. Fiecare client
-are preferințe ascunse (activități, stiluri, nivel, sezon, buget). Setările lui de profil sunt
-apropiate de ele, iar produsele pe care le vede, le salvează și le cumpără depind de cât de
-bine se potrivesc cu ele, plus o popularitate de bază a fiecărui produs.
-
-Rezultatele obținute pe aceste date descriu comportamentul simulatorului, nu preferințe reale.
-"""
 
 import secrets
 from collections.abc import Sequence
@@ -23,7 +14,6 @@ from .timeline import SIMULATION_DAYS, SIMULATION_START, final_favorites
 
 SIMULATION_SEED = 20261116
 SIMULATED_CUSTOMERS = 300
-# Clienții simulați se recunosc după domeniul e-mailului (de exemplu la evaluare).
 SIMULATED_EMAIL_DOMAIN = "simulat.example.com"
 
 ACTIVITIES = [a.value for a in Activity]
@@ -56,7 +46,6 @@ class SimulatedCustomer:
     number: int
     taste: Taste
     profile: dict
-    # (moment, id produs, tip eveniment), în ordine cronologică
     events: list[tuple]
 
 
@@ -71,8 +60,7 @@ def _random_taste(rng: np.random.Generator) -> Taste:
 
 
 def _declared_profile(taste: Taste, rng: np.random.Generator) -> dict:
-    """Setările pe care clientul le-ar completa: apropiate de preferințele ascunse, uneori incomplete."""
-    if rng.random() < 0.1:  # unii clienți nu își completează deloc profilul
+    if rng.random() < 0.1:  
         return {"activities": {}, "level": None, "styles": [], "season": None, "max_budget": None}
     activities = {taste.primary: Intensity.HIGH.value}
     if taste.secondary:
@@ -110,7 +98,6 @@ def _affinity(taste: Taste, products: Sequence[Product], base_popularity: np.nda
 def simulate_customers(
     products: Sequence[Product], count: int = SIMULATED_CUSTOMERS, seed: int = SIMULATION_SEED
 ) -> list[SimulatedCustomer]:
-    """Generează clienții; aceleași produse și același seed dau mereu aceleași date."""
     rng = np.random.default_rng(seed)
     base_popularity = rng.normal(0.0, 0.5, len(products))
     available = np.array([p.available for p in products])
@@ -152,12 +139,10 @@ def simulate_customers(
 def seed_simulated_customers(
     session: Session, count: int = SIMULATED_CUSTOMERS, seed: int = SIMULATION_SEED
 ) -> int:
-    """Adaugă clienții simulați dacă nu există deja niciunul. Întoarce câți au fost creați."""
     existing = session.exec(select(User).where(User.email.like(f"%@{SIMULATED_EMAIL_DOMAIN}"))).first()
     if existing is not None:
         return 0
     products = list(session.exec(select(Product).order_by(Product.id)))
-    # Clienții simulați nu se autentifică: toți primesc hash-ul unei parole aleatoare, necunoscute.
     unusable_hash = hash_password(secrets.token_urlsafe(32))
     for customer in simulate_customers(products, count, seed):
         user = User(

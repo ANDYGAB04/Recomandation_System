@@ -4,12 +4,7 @@ import ProductCard from './ProductCard.jsx'
 import { EmptyState, ErrorState } from './Status.jsx'
 import { errorMessage } from '../lib/api.js'
 
-/**
- * Cardul unui produs recomandat: cardul obișnuit, plus potrivirea și explicația.
- * `scoreLabel` (de exemplu „Potrivire” sau „Asemănare”) lipsește pentru rezerva pe popularitate,
- * unde scorul este numărul de cumpărători, nu o similaritate.
- * Cu `strategy` (lista din care vine produsul), cardul are și întrebarea „Ți-a fost utilă?”.
- */
+
 export function RecommendationCard({ item, scoreLabel, strategy }) {
   const { product, score, explanation } = item
   return (
@@ -27,7 +22,7 @@ export function RecommendationCard({ item, scoreLabel, strategy }) {
   )
 }
 
-/** Mesajul afișat când recomandările vin din rezervă (cele mai cumpărate produse), cu motivul. */
+
 export function FallbackNotice({ reason }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -44,11 +39,7 @@ export function FallbackNotice({ reason }) {
   )
 }
 
-/**
- * Lista de recomandări cu toate stările ei: încărcare, eroare, listă goală, rezervă.
- * `resource` vine din useRecommendations / useSimilarProducts.
- * `withFeedback`: arată „Ți-a fost utilă?” pe fiecare card (recomandări, nu și produse similare).
- */
+
 export default function RecommendationList({
   resource,
   scoreLabel = 'Potrivire',
@@ -90,7 +81,7 @@ export default function RecommendationList({
   const popular = data.strategy === 'popular'
   return (
     <div className="space-y-4">
-      {/* Mesajul despre rezervă doar când există produse de arătat; altfel rămâne starea de listă goală. */}
+      {}
       {popular && data.items.length > 0 && <FallbackNotice reason={data.fallback_reason} />}
       {data.items.length === 0 ? (
         emptyState ?? <EmptyState title="Nu am găsit produse potrivite." />

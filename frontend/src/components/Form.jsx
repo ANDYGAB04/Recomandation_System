@@ -1,4 +1,4 @@
-/** Componente comune pentru formulare. */
+
 
 export function AuthCard({ title, subtitle, children, footer }) {
   return (

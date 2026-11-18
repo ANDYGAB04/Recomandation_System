@@ -7,7 +7,7 @@ import { ApiError, api, errorMessage } from '../lib/api.js'
 
 const SCALE = [1, 2, 3, 4, 5]
 
-/** Erorile 422 pe întrebări: loc = ["body", "answers", "q1"]. */
+
 function questionErrors(error) {
   if (!(error instanceof ApiError) || error.status !== 422 || !Array.isArray(error.data?.detail)) return {}
   const errors = {}
@@ -18,7 +18,7 @@ function questionErrors(error) {
   return errors
 }
 
-/** Chestionarul pentru evaluarea cu utilizatori (pasul 28). Răspunsurile se salvează anonim. */
+
 export default function SurveyPage() {
   const [load, setLoad] = useState({ status: 'loading', data: null, error: null })
   const [reloadKey, setReloadKey] = useState(0)

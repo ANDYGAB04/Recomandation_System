@@ -1,4 +1,4 @@
-/** Stări comune pentru liste și pagini: eroare, listă goală, mențiunea „date de test”. */
+
 
 export function ErrorState({ title = 'Nu am putut încărca datele.', message, onRetry }) {
   return (

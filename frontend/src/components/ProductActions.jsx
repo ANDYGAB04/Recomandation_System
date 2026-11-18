@@ -5,19 +5,15 @@ import { useAuth } from '../lib/auth.jsx'
 import { sendInteraction } from '../lib/interactions.js'
 import { notifyUserDataChanged } from '../lib/userData.js'
 
-/**
- * Butoanele de pe pagina de produs: favorite și cumpărare simulată.
- * Starea vine din istoricul din backend (`history`), deci rămâne corectă după reîncărcare.
- * Cât timp o acțiune e în curs, butoanele sunt blocate: un dublu click trimite un singur eveniment.
- */
+
 export default function ProductActions({ product, history }) {
   const { isAuthenticated } = useAuth()
   const location = useLocation()
-  const busy = useRef(false) // blocare sincronă: al doilea click ajunge înainte de re-render
-  const [pending, setPending] = useState(null) // "favorite" | "purchase" | null
+  const busy = useRef(false) 
+  const [pending, setPending] = useState(null) 
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  // Rezultatul ultimei acțiuni, până sosește istoricul actualizat.
+  
   const [local, setLocal] = useState({})
 
   if (!isAuthenticated) {
@@ -46,7 +42,7 @@ export default function ProductActions({ product, history }) {
     try {
       await sendInteraction(product.id, type)
       onSuccess()
-      notifyUserDataChanged() // istoricul și recomandările se reîncarcă
+      notifyUserDataChanged() 
     } catch (err) {
       if (err.status === 409 && type === 'purchase' && /deja/.test(err.message)) setLocal((l) => ({ ...l, purchased: true }))
       setError(errorMessage(err))

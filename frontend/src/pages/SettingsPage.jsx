@@ -8,11 +8,11 @@ import { useAuth } from '../lib/auth.jsx'
 import { notifyUserDataChanged } from '../lib/userData.js'
 import { useVocabulary } from '../lib/vocabulary.js'
 
-// ---------- Profil (API) ⇄ formular ----------
+
 
 function toForm(profile) {
   return {
-    activities: { ...profile.activities }, // { running: "high" }
+    activities: { ...profile.activities }, 
     level: profile.level ?? '',
     styles: [...profile.styles],
     season: profile.season ?? '',
@@ -31,7 +31,7 @@ function toPayload(form) {
   }
 }
 
-/** Cheie de comparație care nu depinde de ordinea activităților sau a stilurilor. */
+
 function sameSettingsKey(form) {
   const payload = toPayload(form)
   return JSON.stringify({
@@ -51,7 +51,7 @@ function validate(form) {
   return errors
 }
 
-/** Erorile 422 de la PUT /profile, pe câmpurile formularului (loc: ["body", "activities", "running"]). */
+
 function profileFieldErrors(error) {
   if (!(error instanceof ApiError) || error.status !== 422 || !Array.isArray(error.data?.detail)) return {}
   const messages = {
@@ -67,7 +67,7 @@ function profileFieldErrors(error) {
   return errors
 }
 
-// ---------- Componente ----------
+
 
 function Section({ title, description, error, children }) {
   return (
@@ -105,7 +105,7 @@ function Choice({ selected, onClick, children, type = 'radio' }) {
   )
 }
 
-// ---------- Pagina ----------
+
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -115,7 +115,7 @@ export default function SettingsPage() {
   const [load, setLoad] = useState({ status: 'loading', error: null })
   const [reloadKey, setReloadKey] = useState(0)
   const [form, setForm] = useState(null)
-  const [saved, setSaved] = useState(null) // ultimul profil salvat (pentru „modificări nesalvate”)
+  const [saved, setSaved] = useState(null) 
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -166,7 +166,7 @@ export default function SettingsPage() {
     update('styles', form.styles.includes(style) ? form.styles.filter((s) => s !== style) : [...form.styles, style])
 
   const hasActivity = Object.keys(form.activities).length > 0
-  // Bugetul e doar un filtru: fără nicio preferință, recomandările vin din rezervă (cele mai cumpărate).
+  
   const hasPreferences = hasActivity || Boolean(form.level) || form.styles.length > 0 || Boolean(form.season)
   const dirty = sameSettingsKey(form) !== sameSettingsKey(saved)
 
@@ -184,7 +184,7 @@ export default function SettingsPage() {
       setForm(toForm(profile))
       setSaved(toForm(profile))
       setConfirmation(true)
-      notifyUserDataChanged() // recomandările se reîncarcă cu noile setări
+      notifyUserDataChanged() 
     } catch (error) {
       setErrors(profileFieldErrors(error))
       setFormError(errorMessage(error))
@@ -319,7 +319,7 @@ export default function SettingsPage() {
           )}
         </Section>
 
-        {/* Bara de salvare rămâne vizibilă la derulare, util mai ales pe telefon. */}
+        {}
         <div className="sticky bottom-0 -mx-4 border-t border-gray-200 bg-gray-50/95 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:bg-white sm:shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div aria-live="polite" className="text-sm">

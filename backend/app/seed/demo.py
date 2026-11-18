@@ -1,9 +1,3 @@
-"""Cele două conturi demonstrative, cu date complet diferite (cerință de la laborator).
-
-Maria și Radu nu au nicio activitate, niciun stil și niciun sezon în comun, iar istoricul
-fiecăruia conține doar produse din activitățile lui. Recomandările lor nu trebuie să aibă
-niciun produs comun.
-"""
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -28,7 +22,6 @@ class DemoAccount:
     styles: list[str]
     season: str
     max_budget: float | None
-    # (zile înainte de sfârșitul perioadei simulate, numele produsului, tipul evenimentului)
     history: list[tuple[int, str, str]] = field(default_factory=list)
 
 
@@ -75,7 +68,6 @@ DEMO_CREATED_AT = SIMULATION_END - timedelta(days=30)
 
 
 def seed_demo_accounts(session: Session) -> int:
-    """Creează conturile demo care lipsesc (după e-mail). Întoarce câte conturi noi au fost create."""
     products = {p.name: p for p in session.exec(select(Product))}
     created = 0
     for account in DEMO_ACCOUNTS:

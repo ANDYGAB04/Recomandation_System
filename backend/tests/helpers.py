@@ -1,4 +1,3 @@
-"""Funcții comune testelor de API."""
 
 
 def register(client, email="ana@exemplu.ro", password="parola-secreta", display_name="Ana"):

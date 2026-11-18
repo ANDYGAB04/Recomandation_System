@@ -82,7 +82,7 @@ def test_password_is_stored_only_as_hash(client):
     with db_session(client) as session:
         user = session.exec(select(User)).one()
     assert ANA["password"] not in user.password_hash
-    assert user.password_hash.startswith("$2")  # format bcrypt
+    assert user.password_hash.startswith("$2")  
 
 
 def test_long_passwords_differ_after_72_bytes(client):

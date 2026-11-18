@@ -1,11 +1,3 @@
-"""Scriptul de inițializare a datelor de test.
-
-    python -m app.seed            # din directorul backend/: completează ce lipsește
-    python -m app.seed --reset    # șterge toate datele și le recreează (de exemplu înainte de prezentare)
-
-Încarcă catalogul, cele două conturi demonstrative (Maria și Radu), clienții simulați și date de test
-pentru evaluarea cu utilizatori (voturi și răspunsuri la chestionar, marcate ca date de test).
-"""
 
 from dataclasses import dataclass
 
@@ -30,11 +22,6 @@ __all__ = [
 
 
 def seed_catalog(session: Session, seed: int = CATALOG_SEED) -> tuple[int, int]:
-    """Încarcă sau actualizează catalogul (după nume). Întoarce (produse noi, produse actualizate).
-
-    Rulat de mai multe ori, lasă aceleași date: produsele existente se suprascriu cu
-    aceleași valori, iar id-urile lor nu se schimbă.
-    """
     existing = {p.name: p for p in session.exec(select(Product))}
     created = updated = 0
     for data in build_catalog(seed):
@@ -63,7 +50,6 @@ class SeedSummary:
 def seed_all(
     session: Session, customers: int = SIMULATED_CUSTOMERS, simulation_seed: int = SIMULATION_SEED
 ) -> SeedSummary:
-    """Completează datele de test care lipsesc; nu atinge conturile create de utilizatori."""
     created, updated = seed_catalog(session)
     demo = seed_demo_accounts(session)
     simulated = seed_simulated_customers(session, customers, simulation_seed)
@@ -72,8 +58,7 @@ def seed_all(
 
 
 def reset_database(engine: Engine) -> None:
-    """Șterge toate tabelele (și datele) și le recreează goale."""
-    from .. import models  # noqa: F401  (înregistrează modelele în SQLModel.metadata)
+    from .. import models  
 
     SQLModel.metadata.drop_all(engine)
     init_db(engine)

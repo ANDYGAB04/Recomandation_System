@@ -1,13 +1,4 @@
-/**
- * Etichetele în română pentru valorile fixe (activități, niveluri, stiluri…), din GET /vocabulary.
- *
- *   const { label, options } = useVocabulary()
- *   label('activities', 'running')   // "Alergare"
- *   options('activities')            // [{ value: "hiking", label: "Drumeție" }, …]
- *
- * Se cer o singură dată per încărcare a aplicației. Până sosesc (sau dacă API-ul nu răspunde),
- * `label` întoarce chiar valoarea.
- */
+
 import { useEffect, useState } from 'react'
 import { api } from './api.js'
 
@@ -35,7 +26,7 @@ export function useVocabulary() {
     let active = true
     loadVocabulary()
       .then((data) => active && setVocabulary(data))
-      .catch(() => {}) // fără etichete: se afișează valorile
+      .catch(() => {}) 
     return () => {
       active = false
     }

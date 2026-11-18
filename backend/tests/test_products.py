@@ -66,11 +66,11 @@ def test_filter_available_only(catalog):
 @pytest.mark.parametrize(
     ("q", "expected"),
     [
-        ("cort", ["Cort Ușor 2P"]),             # nume
-        ("POTECI", ["Pantofi Trail"]),          # descriere, fără să conteze literele mari
-        ("siguranță", ["Cască Oraș"]),          # etichetă
-        ("siguranta", ["Cască Oraș"]),          # fără diacritice
-        ("pantofi sosea", ["Pantofi Șosea Start", "Pantofi Șosea Vechi"]),  # toți termenii
+        ("cort", ["Cort Ușor 2P"]),             
+        ("POTECI", ["Pantofi Trail"]),          
+        ("siguranță", ["Cască Oraș"]),          
+        ("siguranta", ["Cască Oraș"]),          
+        ("pantofi sosea", ["Pantofi Șosea Start", "Pantofi Șosea Vechi"]),  
         ("inexistent", []),
     ],
 )

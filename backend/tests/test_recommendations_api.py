@@ -51,7 +51,6 @@ def event(client, headers, product_id, event_type):
     assert client.post("/interactions", json=body, headers=headers).status_code == 201
 
 
-# ---- GET /recommendations ----
 
 def test_recommendations_require_authentication(api):
     assert api.get("/recommendations").status_code == 401
@@ -84,7 +83,6 @@ def test_new_profile_settings_are_reflected_immediately(api):
     assert api.put("/profile", json=settings, headers=headers).status_code == 200
     after = recommendations(api, headers)
     assert ids(after) != ids(before)
-    # Istoricul de alergare al Mariei contează în continuare (α = 0,5), dar majoritatea listei e acum ciclism.
     cycling = [item for item in after["items"] if item["product"]["category"] == "cycling"]
     assert not any(item["product"]["category"] == "cycling" for item in before["items"])
     assert len(cycling) >= 5
@@ -133,12 +131,10 @@ def test_k_is_validated(api):
     assert api.get("/recommendations", headers=headers, params={"k": 51}).status_code == 422
 
 
-# ---- GET /recommendations/profile ----
 
 def test_recommendation_profile_shows_sources_interests_and_products(api):
     data = api.get("/recommendations/profile", headers=login(api, MARIA)).json()
     assert data["sources"] == {"declared": ALPHA, "behavior": 1 - ALPHA}
-    # o cumpărare (10), un favorit (5), 4 vizualizări (1 fiecare) → 19
     assert data["behavior_breakdown"] == {"purchase": round(10 / 19, 4), "favorite": round(5 / 19, 4), "view": round(4 / 19, 4)}
     assert data["interests"][0]["label"] == "Alergare"
     assert sum(i["weight"] for i in data["interests"]) <= 1.0001
@@ -163,7 +159,6 @@ def test_empty_account_has_an_empty_recommendation_profile(api):
     }
 
 
-# ---- GET /products/{id}/similar ----
 
 def test_similar_products_work_without_login(api):
     items = api.get("/products/1/similar", params={"k": 3}).json()["items"]
@@ -185,7 +180,6 @@ def test_similar_errors(api):
     assert api.get("/products/1/similar", headers={"Authorization": "Bearer invalid"}).status_code == 401
 
 
-# ---- Catalogul ----
 
 def test_vectors_are_rebuilt_when_the_catalog_changes(api, seeded):
     headers = login(api, MARIA)

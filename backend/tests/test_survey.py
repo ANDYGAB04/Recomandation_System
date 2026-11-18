@@ -34,7 +34,6 @@ def test_submit_once_and_answers_are_anonymous(client):
     with Session(client.app.state.engine) as session:
         saved = session.exec(select(SurveyResponse)).one()
         assert saved.answers == {**ANSWERS, "q6": "Mi-au plăcut explicațiile."}
-        # Răspunsul nu are nicio coloană care să-l lege de cont.
         assert set(SurveyResponse.model_fields) == {"id", "answers", "created_at", "is_test_data"}
         assert saved.is_test_data is False
         user = session.exec(select(User)).one()

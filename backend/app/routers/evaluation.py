@@ -15,10 +15,6 @@ NO_DATA = "Nu există date de evaluat. Rulează `python -m app.seed` în directo
 
 @router.get("/evaluation")
 def get_evaluation(request: Request, session: SessionDep) -> EvaluationOut:
-    """Popularitate vs. recomandarea bazată pe profil, pe istoricul clienților simulați (date sintetice).
-
-    Rezultatul se calculează o dată și se refolosește cât timp produsele și interacțiunile nu se schimbă.
-    """
     key = (
         session.exec(select(func.count(Interaction.id), func.max(Interaction.id))).one(),
         session.exec(select(func.count(Product.id), func.sum(Product.price), func.sum(Product.available))).one(),
@@ -43,14 +39,8 @@ def _counts(votes: list[bool]) -> FeedbackCounts:
 
 @router.get("/evaluation/feedback")
 def get_feedback_summary(session: SessionDep) -> FeedbackSummary:
-    """Părerea utilizatorilor: câte recomandări au fost votate „utile”, pe strategii.
-
-    Câmpurile principale numără doar conturile reale: fără conturile demo (Maria, Radu) și fără clienții
-    simulați. Voturile de test ale clienților simulați sunt separat, în `test_data`.
-    """
     rows = list(session.exec(select(RecommendationFeedback, User.email).join(User, User.id == RecommendationFeedback.user_id)))
     real = [f for f, email in rows if email not in DEMO_EMAILS and not is_simulated_email(email)]
-    # Voturile de test (python -m app.seed) vin de la clienții simulați și se raportează separat.
     test = [f for f, email in rows if is_simulated_email(email)]
     return FeedbackSummary(**_groups(real).model_dump(), test_data=_groups(test))
 

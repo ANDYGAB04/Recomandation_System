@@ -1,10 +1,3 @@
-"""Recomandările finale: profilul combinat, excluderile, rezerva pe popularitate și explicațiile.
-
-    profil(u) = normalizează(α × profil_declarat(u) + (1 − α) × profil_comportament(u))
-
-Dacă una dintre cele două părți lipsește, profilul este cealaltă. Dacă lipsesc amândouă
-(setări necompletate și niciun istoric), recomandăm cele mai cumpărate produse și spunem asta.
-"""
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -16,8 +9,6 @@ from .behavior import EVENT_WEIGHTS, History
 from .engine import ContentRecommender
 from .features import DeclaredProfileLike, declared_choices, split_feature
 
-# Ponderea datelor declarate în profilul combinat; restul vine din comportament.
-# Aleasă pe validare la evaluarea offline (app/evaluation.py), dintre 0; 0,25; 0,5; 0,75; 1.
 ALPHA = 0.75
 
 PERSONALIZED = "personalized"
@@ -25,7 +16,6 @@ POPULAR = "popular"
 NO_PROFILE_REASON = "Completează setările de profil pentru recomandări personalizate."
 NO_MATCH_REASON = "Niciun produs disponibil nu se potrivește profilului și bugetului tău."
 
-# Grupul de caracteristici → grupul din GET /vocabulary (categoria și utilizările sunt amândouă activități).
 VOCABULARY_GROUPS = {
     "category": ("activities", Activity),
     "usage": ("activities", Activity),
@@ -43,7 +33,6 @@ HISTORY_SOURCES = {
 
 @dataclass(frozen=True)
 class Match:
-    """O preferință care a contribuit la scor, de exemplu („activities”, „running”)."""
 
     group: str
     value: str
@@ -98,10 +87,6 @@ def recommend(
     event_weights: Mapping[str, float] = EVENT_WEIGHTS,
     explain: bool = True,
 ) -> RecommendationList:
-    """Recomandările pentru un utilizator. Produsele cumpărate nu se recomandă niciodată.
-
-    `event_weights` și `explain=False` sunt folosite la evaluare (alte ponderi, fără explicații).
-    """
     excluded = set(exclude) | history.purchased
     max_price = profile.max_budget if profile is not None else None
     declared = rec.declared_profile(profile) if profile is not None else None
@@ -133,7 +118,6 @@ def popular(
     max_price: float | None = None,
     reason: str | None = NO_PROFILE_REASON,
 ) -> RecommendationList:
-    """Rezerva: produsele disponibile cu cei mai mulți cumpărători distincți."""
     excluded = set(exclude)
     candidates = [
         p for p in rec.products
@@ -148,7 +132,6 @@ def popular(
 
 
 def similar(rec: ContentRecommender, product_id: int, k: int = 4, exclude: Iterable[int] = ()) -> list[Recommendation]:
-    """Produsele cele mai asemănătoare cu `product_id` (fără el însuși și fără cele excluse)."""
     vector = rec.product_vector(product_id)
     ranked = rec.rank(vector, k, set(exclude) | {product_id})
     items = []
@@ -166,10 +149,6 @@ def _matched(
     allowed: set[str] | None = None,
     top: int = 3,
 ) -> list[Match]:
-    """Preferințele prezente atât în `reference`, cât și în produs, ordonate după contribuția la scor.
-
-    Cu `allowed`, doar caracteristicile din acea mulțime (de exemplu, cele alese explicit în setări).
-    """
     n = rec.n_preference_features
     contributions = reference[:n] * product[:n]
     if allowed is not None:
@@ -194,7 +173,6 @@ def _explain(
     product_id: int,
 ) -> Explanation:
     product = rec.product_vector(product_id)
-    # „Ai ales” se referă doar la ce a ales utilizatorul în setări și se regăsește în produs.
     matched = _matched(rec, declared, product, choices) if declared is not None else []
     influences = sorted(
         ((w * rec.similarity(product_id, pid), pid) for pid, w in weights.items() if pid != product_id and pid in rec.row),
@@ -222,22 +200,17 @@ def _join(matches: list[Match]) -> str:
 def _popular_text(count: int) -> str:
     if count == 0:
         return "Produs disponibil în catalog."
-    # „1 client”, „5 clienți”, „20 de clienți”
     noun = "client" if count == 1 else ("de clienți" if count % 100 == 0 or count % 100 >= 20 else "clienți")
     return f"Printre cele mai cumpărate: {count} {noun}."
 
 
 @dataclass(frozen=True)
 class ProfileSummary:
-    """Pe ce date se bazează recomandările unui utilizator (pagina „Profilul meu de recomandare”)."""
 
     declared_share: float
     behavior_share: float
-    # tipul acțiunii → partea ei din profilul din comportament (însumează 1; gol fără istoric)
     behavior_breakdown: dict[str, float]
-    # (preferință, pondere); ponderile tuturor preferințelor din profil însumează 1
     interests: list[tuple[Match, float]]
-    # (id produs, pondere în profilul din comportament, tipurile de evenimente)
     top_products: list[tuple[int, float, list[str]]]
 
 

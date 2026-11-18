@@ -1,4 +1,3 @@
-"""Formatul JSON al cererilor și răspunsurilor API (vezi docs/api.md)."""
 
 from datetime import UTC, datetime
 from typing import Annotated, Literal
@@ -9,11 +8,9 @@ from .vocabulary import Activity, EventType, Intensity, Level, Season, Style
 
 
 def _as_utc(value: datetime) -> datetime:
-    # SQLite nu păstrează fusul orar; momentele salvate sunt mereu în UTC.
     return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
 
 
-# Moment în UTC, scris ca "2026-11-15T14:30:00Z".
 UtcDatetime = Annotated[
     datetime,
     AfterValidator(_as_utc),
@@ -23,7 +20,6 @@ UtcDatetime = Annotated[
 Email = Annotated[EmailStr, AfterValidator(str.lower)]
 
 
-# ---------- Conturi ----------
 
 
 class RegisterRequest(BaseModel):
@@ -53,7 +49,6 @@ class TokenResponse(BaseModel):
     user: UserPublic
 
 
-# ---------- Catalog ----------
 
 
 class ProductOut(BaseModel):
@@ -78,11 +73,9 @@ class ProductPage(BaseModel):
     offset: int
 
 
-# ---------- Profil ----------
 
 
 class ProfileIn(BaseModel):
-    """Setările de profil. Un câmp lipsă înseamnă „necompletat”; valorile sunt cele din GET /vocabulary."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -110,7 +103,6 @@ class ProfileOut(BaseModel):
     updated_at: UtcDatetime
 
 
-# ---------- Interacțiuni ----------
 
 
 class InteractionIn(BaseModel):
@@ -121,7 +113,6 @@ class InteractionIn(BaseModel):
 
 class InteractionRecorded(BaseModel):
     event_id: str
-    # false dacă evenimentul cu același event_id fusese deja salvat
     recorded: bool
 
 
@@ -148,7 +139,6 @@ class HistoryOut(BaseModel):
     events: list[EventOut]
 
 
-# ---------- Recomandări ----------
 
 
 class MatchOut(BaseModel):
@@ -170,7 +160,6 @@ class RecommendationOut(BaseModel):
 
 
 class RecommendationsOut(BaseModel):
-    # "personalized" (din profil) sau "popular" (rezervă)
     strategy: str
     fallback_reason: str | None
     items: list[RecommendationOut]
@@ -197,13 +186,11 @@ class ProfileProductOut(BaseModel):
 
 class RecommendationProfileOut(BaseModel):
     sources: ProfileSources
-    # "purchase" / "favorite" / "view" → partea din profilul din comportament; {} fără istoric
     behavior_breakdown: dict[str, float]
     interests: list[InterestOut]
     top_products: list[ProfileProductOut]
 
 
-# ---------- Evaluare ----------
 
 
 class MetricsOut(BaseModel):
@@ -213,16 +200,13 @@ class MetricsOut(BaseModel):
 
 class EvaluationRow(MetricsOut):
     config: str
-    # "personalized" (profil) sau "popular"
     strategy: str
     alpha: float | None
     event_weights: str | None
     coverage: float
     latency_ms: float | None
-    # utilizatori evaluați (cu istoric înainte de interval)
     users: int
     users_without_history: int
-    # metricile pentru utilizatorii fără istoric, raportate separat
     without_history: MetricsOut
 
 
@@ -244,13 +228,11 @@ class EvaluationOut(BaseModel):
     test: EvaluationWindow
 
 
-# ---------- Feedback la recomandări ----------
 
 
 class FeedbackIn(BaseModel):
     product_id: int
     useful: bool
-    # Strategia listei din care a venit produsul (câmpul `strategy` din GET /recommendations).
     strategy: Literal["personalized", "popular"] = "personalized"
 
 
@@ -264,7 +246,6 @@ class FeedbackOut(BaseModel):
 class FeedbackCounts(BaseModel):
     votes: int
     useful: int
-    # partea voturilor „util”; null fără voturi
     useful_share: float | None
 
 
@@ -275,12 +256,10 @@ class FeedbackGroups(FeedbackCounts):
 
 
 class FeedbackSummary(FeedbackGroups):
-    """Voturile reale, plus separat voturile de test ale clienților simulați."""
 
     test_data: FeedbackGroups
 
 
-# ---------- Chestionar ----------
 
 
 class SurveyQuestionOut(BaseModel):
@@ -293,14 +272,10 @@ class SurveyQuestionOut(BaseModel):
 
 class SurveyOut(BaseModel):
     questions: list[SurveyQuestionOut]
-    # true dacă utilizatorul autentificat a completat deja chestionarul; null fără autentificare
     answered: bool | None
-    # răspunsurile reale (de la participanți)
     responses: int
-    # răspunsurile generate ca date de test (`python -m app.seed`), numărate separat
     test_responses: int = 0
 
 
 class SurveyAnswersIn(BaseModel):
-    # {"q1": 4, …, "q5": 5, "q6": "text liber, opțional"}
     answers: dict[str, int | str | None]

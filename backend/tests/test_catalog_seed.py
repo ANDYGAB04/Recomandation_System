@@ -34,12 +34,10 @@ def test_catalog_size_and_values():
 
 def test_catalog_covers_both_demo_profiles():
     catalog = build_catalog()
-    # Maria: alergare, începătoare, vară, buget redus.
     assert any(
         "running" in p["usages"] and "beginner" in p["levels"] and "budget" in p["styles"] and "summer" in p["seasons"]
         for p in catalog
     )
-    # Radu: camping și drumeție de iarnă, avansat, rezistență.
     assert any(
         {"camping", "hiking"} & set(p["usages"]) and "advanced" in p["levels"] and "durable" in p["styles"]
         and "winter" in p["seasons"]

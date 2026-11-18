@@ -1,10 +1,3 @@
-"""Chestionarul pentru utilizatori (pasul 28): întrebările, într-un singur loc.
-
-Backendul validează răspunsurile după această listă, frontendul o citește din GET /survey,
-iar exportul CSV (python -m app.survey_export) o folosește pentru coloane.
-Dacă schimbi întrebările după ce au început răspunsurile, adaugă întrebări noi, nu le
-renumerota pe cele vechi: răspunsurile salvate se leagă de `id`.
-"""
 
 from dataclasses import dataclass
 
@@ -16,9 +9,9 @@ OPEN_MAX_LENGTH = 1000
 class Question:
     id: str
     text: str
-    kind: str  # "scale" (1–5) sau "open" (text liber, opțional)
-    low: str = ""  # eticheta lui 1
-    high: str = ""  # eticheta lui 5
+    kind: str  
+    low: str = ""  
+    high: str = ""  
 
 
 QUESTIONS: tuple[Question, ...] = (

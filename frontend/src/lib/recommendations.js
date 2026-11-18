@@ -1,14 +1,4 @@
-/**
- * Încărcarea recomandărilor (GET /recommendations) și a produselor similare (GET /products/{id}/similar).
- *
- *   const { status, data, error, reload } = useRecommendations({ k: 12, exclude: [productId] })
- *   const { status, data, error, reload } = useSimilarProducts(productId, 4)
- *   const { status, data, error, reload } = useRecommendationProfile()   // GET /recommendations/profile
- *   const { status, data, error, reload } = useApiResource('/profile')   // orice GET autentificat
- *
- * status: "loading" | "ready" | "error". Listele se reîncarcă singure când se schimbă contul
- * sau când o pagină anunță o schimbare a datelor utilizatorului (vezi userData.js).
- */
+
 import { useEffect, useState } from 'react'
 import { api } from './api.js'
 import { useAuth } from './auth.jsx'
@@ -23,7 +13,7 @@ export function useApiResource(path, enabled = true) {
   useEffect(() => {
     if (!enabled) return
     let active = true
-    // Datele vechi rămân vizibile (estompat) cât se încarcă cele noi.
+    
     setState((current) => ({ ...current, status: 'loading', error: null }))
     api
       .get(path)

@@ -16,10 +16,7 @@ const EVENTS = {
 
 const percent = (value) => `${Math.round(value * 100)}%`
 
-/**
- * Pe ce date se bazează recomandările: setările față de comportament, interesele dominante,
- * setările alese și produsele din istoric. Utilă la prezentare: arată că recomandarea vine din profil.
- */
+
 export default function ProfilePage() {
   const summary = useRecommendationProfile()
   const settings = useApiResource('/profile')
@@ -122,7 +119,7 @@ function Sources({ data }) {
       title="Din ce se formează profilul"
       description="Recomandările combină setările tale cu ce faci în aplicație. Cumpărăturile contează cel mai mult, apoi favoritele, apoi vizualizările."
     >
-      {/* Bara întreagă = 100% din profil */}
+      {}
       <div className="flex h-4 w-full overflow-hidden rounded-full bg-gray-100" role="img" aria-label={`Setări ${percent(declared)}, comportament ${percent(behavior)}`}>
         {declared > 0 && <div className="h-full bg-sky-600" style={{ width: percent(declared) }} />}
         {breakdown.map((part) => (
@@ -177,7 +174,7 @@ function Interests({ interests }) {
                 </span>
                 <span className="tabular-nums text-gray-600">{percent(interest.weight)}</span>
               </div>
-              {/* Bara relativă la cel mai important interes, ca diferențele să se vadă ușor. */}
+              {}
               <div className="mt-1">
                 <Bar value={max > 0 ? interest.weight / max : 0} />
               </div>

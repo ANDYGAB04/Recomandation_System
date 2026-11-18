@@ -3,11 +3,7 @@ import RecommendationList from './RecommendationList.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useRecommendations } from '../lib/recommendations.js'
 
-/**
- * O secțiune scurtă „Recomandate pentru tine” (catalog, pagina de produs).
- * Pentru vizitatorii neautentificați arată o invitație de a-și crea cont.
- * `exclude`: produse care nu trebuie să apară (de exemplu, produsul deschis în pagină).
- */
+
 export default function RecommendedStrip({ title = 'Recomandate pentru tine', count = 4, exclude = [] }) {
   const { isAuthenticated, status } = useAuth()
   const recommendations = useRecommendations({ k: count, exclude, enabled: isAuthenticated })

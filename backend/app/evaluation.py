@@ -1,19 +1,3 @@
-"""Evaluarea offline: popularitate vs. recomandarea bazată pe profil, pe istoricul clienților simulați.
-
-    python -m app.evaluation        # din directorul backend/: afișează rezultatele în terminal
-
-Metodologia:
-
-- Istoricul de 90 de zile se împarte cronologic: antrenare (zilele 0–60), validare (60–75),
-  test (75–90).
-- Pentru fiecare interval, profilurile din comportament și popularitatea se construiesc numai
-  din evenimentele de dinaintea lui. Setările declarate sunt cele salvate în profil.
-- „Relevant” = produs cumpărat în interval, încă disponibil și necumpărat înainte.
-- Ponderile (α și ponderile acțiunilor) se aleg pe validare; rezultatul final se raportează pe test,
-  pentru configurația aleasă, pentru cea folosită de aplicație și pentru popularitate.
-
-Datele sunt sintetice: rezultatele descriu comportamentul simulatorului, nu preferințe reale.
-"""
 
 import time
 from collections import defaultdict
@@ -44,14 +28,13 @@ ALPHAS = (0.0, 0.25, 0.5, 0.75, 1.0)
 @dataclass(frozen=True)
 class Config:
     name: str
-    strategy: str  # "personalized" sau "popular"
+    strategy: str  
     alpha: float = ALPHA
     weights: str = "curs 1/5/10"
 
 
 POPULARITY = Config("popularitate", "popular")
 APP_CONFIG = Config(f"profil: α = {ALPHA}, curs 1/5/10 (folosită de aplicație)", "personalized", ALPHA)
-# Ponderile de pornire din propunere, păstrate în raport pentru comparație.
 INITIAL_CONFIG = Config("profil: α = 0.5, curs 1/5/10 (ponderile inițiale)", "personalized", 0.5)
 
 
@@ -68,7 +51,6 @@ GRID = [Config(_config_name(a, w), "personalized", a, w) for a in ALPHAS for w i
 
 @dataclass
 class Window:
-    """Un interval evaluat: istoricul de dinainte de `start`, cumpărările relevante din [start, end)."""
 
     start: datetime
     end: datetime
@@ -85,7 +67,6 @@ def _utc(moment: datetime) -> datetime:
 def build_window(
     products: Sequence, events: Sequence[tuple[int, int, str, datetime]], start: datetime, end: datetime
 ) -> Window:
-    """`events`: (utilizator, produs, tip, moment), în ordine cronologică."""
     window = Window(start, end)
     past: dict[int, list[tuple[int, str]]] = defaultdict(list)
     future: dict[int, set[int]] = defaultdict(set)
@@ -113,7 +94,6 @@ def build_window(
 
 
 def _summary(rows: list[tuple[int, int]], k: int) -> tuple[float | None, float | None]:
-    """(precision@k, recall@k) medii; rows = (produse relevante găsite, produse relevante)."""
     if not rows:
         return None, None
     precision = sum(hits for hits, _ in rows) / (k * len(rows))
@@ -124,7 +104,6 @@ def _summary(rows: list[tuple[int, int]], k: int) -> tuple[float | None, float |
 def evaluate_config(
     window: Window, rec: ContentRecommender, profiles: Mapping[int, UserProfile], config: Config, k: int = K
 ) -> dict:
-    """Metricile pe utilizatorii cu istoric; cei fără istoric înainte de interval sunt raportați separat."""
     with_history, without_history, latencies = [], [], []
     recommended: set[int] = set()
     weights = WEIGHT_PRESETS[config.weights]
@@ -174,7 +153,7 @@ def _window_info(window: Window, rows: list[dict]) -> dict:
 
 def run(products: Sequence, profiles: Mapping[int, UserProfile], events: Sequence[tuple], k: int = K) -> dict:
     rec = ContentRecommender(products)
-    day = lambda n: SIMULATION_START + timedelta(days=n)  # noqa: E731
+    day = lambda n: SIMULATION_START + timedelta(days=n)  
     validation = build_window(products, events, day(VALIDATION_START_DAY), day(TEST_START_DAY))
     test = build_window(products, events, day(TEST_START_DAY), day(SIMULATION_DAYS + 1))
 
@@ -201,7 +180,6 @@ def run(products: Sequence, profiles: Mapping[int, UserProfile], events: Sequenc
 
 
 def load_and_run(session: Session, k: int = K) -> dict:
-    """Evaluarea pe clienții simulați din baza de date."""
     products = list(session.exec(select(Product).order_by(Product.id)))
     simulated = {u.id for u in session.exec(select(User)) if is_simulated_email(u.email)}
     profiles = {p.user_id: p for p in session.exec(select(UserProfile)) if p.user_id in simulated}

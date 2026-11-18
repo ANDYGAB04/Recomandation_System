@@ -1,9 +1,6 @@
 import { useFeedbackVote } from '../lib/feedback.js'
 
-/**
- * „Ți-a fost utilă?” cu Da / Nu, sub o recomandare.
- * `relative z-10` ține butoanele deasupra linkului care acoperă cardul, deci un clic nu deschide produsul.
- */
+
 export default function FeedbackButtons({ productId, strategy }) {
   const { enabled, loaded, vote, pending, error, send } = useFeedbackVote(productId)
   if (!enabled) return null
